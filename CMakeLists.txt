@@ -17,5 +17,5 @@ file(GLOB_RECURSE
 
 add_executable(${PROGRAM_NAME} ${PROJECT_SOURCE_FILES})
 
-target_include_directories(${PROGRAM_NAME} PRIVATE ${PROJECT_HEADER_FILES})
+target_include_directories(${PROGRAM_NAME} PRIVATE include)
 target_compile_features(${PROGRAM_NAME} PRIVATE cxx_std_20)
