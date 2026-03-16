@@ -2,7 +2,7 @@
 
 #include "mgraphfwd.hpp"
 #include "parameter.hpp"
-#include "operand.hpp"
+#include "operation.hpp"
 #include <regex>
 
 namespace mg
@@ -10,10 +10,10 @@ namespace mg
 	class action
 	{
 		parameter m_left, m_right;
-		operand m_op;
+		operation m_op;
 
 	public:
-		action(const parameter &opleft, const operand &op, const parameter &opright);
+		action(const parameter &opleft, const operation &op, const parameter &opright);
 		template<class... Args>
 		action(const function &f, const Args &...args);
 	};
