@@ -37,7 +37,7 @@ namespace mg
 		unnamed_parameter(const string_type &value)
 			: m_value(parse_parameter(value))
 		{}
-		explicit unnamed_parameter(const num_or_var_t &value)
+		unnamed_parameter(const num_or_var_t &value)
 			: m_value(value)
 		{}
 		bool is_variable() const
