@@ -1,20 +1,22 @@
 #pragma once
 
 #include "mgraphfwd.hpp"
-#include "parameter.hpp"
-#include "operation.hpp"
-#include <regex>
+#include "operator_action.hpp"
+#include "function.hpp"
+#include <variant>
 
 namespace mg
 {
 	class action
 	{
-		parameter m_left, m_right;
-		operation m_op;
+		std::variant<operator_action, function> m_action;
 
 	public:
-		action(const parameter &opleft, const operation &op, const parameter &opright);
-		template<class... Args>
-		action(const function &f, const Args &...args);
+		action(const operator_action &op_act)
+			: m_action(op_act)
+		{}
+		action(const function &f)
+			: m_action(f)
+		{}
 	};
 } // namespace mg

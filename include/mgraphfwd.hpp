@@ -10,10 +10,11 @@ namespace mg
 	class number;
 	class variable;
 	class parameter;
-	class unresolved_expression;
 	class operation;
 	class function;
+	class operator_action;
 	class action;
+	class unresolved_expression;
 	class expression;
 	class string_expression;
 
