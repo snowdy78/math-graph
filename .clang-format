@@ -1,0 +1,88 @@
+Language: Cpp
+BasedOnStyle: LLVM
+AccessModifierOffset: -4
+AlignAfterOpenBracket: BlockIndent
+AlignArrayOfStructures: Left
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: Left
+AlignOperands: true
+AlignTrailingComments: true
+AllowAllArgumentsOnNextLine: false
+SortIncludes: Never
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCompoundRequirementOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: Empty
+AllowShortLoopsOnASingleLine: false
+BraceWrapping: 
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  AfterExternBlock: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: false
+  BeforeWhile: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+BreakBeforeBinaryOperators: All
+BreakBeforeBraces: Custom
+BreakBeforeInlineASMColon: Never
+PackConstructorInitializers: Never 
+PenaltyBreakAssignment: 1
+PenaltyBreakBeforeFirstCallParameter: 1
+BreakConstructorInitializers: BeforeColon
+BreakConstructorInitializersBeforeComma: false
+BreakBeforeConceptDeclarations: Always
+AlwaysBreakAfterDefinitionReturnType: false
+AlwaysBreakTemplateDeclarations: Yes
+AllowBreakBeforeNoexceptSpecifier: Always
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterFunctionDeclarationName: false
+  AfterOverloadedOperator: false
+  AfterPlacementOperator: false
+  AfterRequiresInClause: true
+  AfterRequiresInExpression: true
+  BeforeNonEmptyParentheses: false
+ColumnLimit: 120
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+Cpp11BracedListStyle: false
+IncludeCategories: 
+  - Regex: '^<.*'
+    Priority: 1
+  - Regex: '^".*'
+    Priority: 2
+  - Regex: '.*'
+    Priority: 3
+IncludeIsMainRegex: '([-_](test|unittest))?$'
+IndentCaseLabels: true
+IndentGotoLabels: false
+IndentWidth: 4
+InsertNewlineAtEOF: true
+MacroBlockBegin: ''
+MacroBlockEnd: ''
+MaxEmptyLinesToKeep: 2
+NamespaceIndentation: All
+SpaceAfterCStyleCast: true
+SpaceAfterTemplateKeyword: false
+SpaceBeforeRangeBasedForLoopColon: false
+SpaceInEmptyParentheses: false
+SpacesInAngles: false
+SpacesInConditionalStatement: false
+SpacesInCStyleCastParentheses: false
+SpacesInParentheses: false
+TabWidth: 4
+UseTab: Always
