@@ -1,55 +1,59 @@
 #pragma once
 
 #include "mgraphfwd.hpp"
-#include "unnamed_parameter.hpp"
-#include <regex>
+#include "number.hpp"
 #include <stdexcept>
-#include <variant>
+#include <map>
+#include <functional>
+#include <list>
+
 namespace mg
 {
 
 	class operation
 	{
-		using result_type = std::variant<number, unresolved_expression>;
-
-		constexpr static const char *s_pattern = R"(^[\+]|^[\-]|^[\*]|^[\/]|^[\^])";
+		using key_type = char_type;
+		using compute_map_type
+			= std::unordered_map<const operation *, std::function<number(const number &, const number &)>>;
 
 	private:
-		string_type parse(const string_type &op)
+		constexpr static const char *s_pattern = "*-+/^";
+		constexpr static key_type parse(const key_type &op)
 		{
-			std::regex rgx(s_pattern);
-			std::smatch match;
-			if (!std::regex_search(op, match, rgx))
+			std::string allowed(s_pattern);
+			if (allowed.find(op) == std::string::npos)
 			{
-				throw std::runtime_error("the name '" + op + "'" + " is not operation");
+				throw std::runtime_error("unknown operation syntax");
 			}
-			m_name = match[0];
-			return m_name;
+			return op;
 		}
-		result_type add(const unnamed_parameter &left, const unnamed_parameter &right)
-		{
-			if (left.is_number() && right.is_number())
-			{
-				return left.as_number() + right.as_number();
-			}
-		}
-
-	public:
-		operation(const string_type &op)
+		constexpr operation(const key_type &op)
 			: m_name(parse(op))
 		{}
+		operation(const operation &other) = default;
+		operation(operation &&other)	  = default;
 
-		string_type get() const
+	public:
+		constexpr key_type get() const
 		{
 			return m_name;
 		}
-		result_type compute() const
-		{
-			if (m_name == "+")
-			{}
-		}
+		static compute_map_type get_compute_map();
+		static const operation &get_by_name(const key_type &);
+		bool operator==(const operation &other) const;
 
 	private:
-		string_type m_name;
+		key_type m_name;
+		friend class unique_operations;
 	};
+	struct unique_operations
+	{
+		constexpr static operation add{ '+' };
+		constexpr static operation sub{ '-' };
+		constexpr static operation mul{ '*' };
+		constexpr static operation div{ '/' };
+		constexpr static operation pow{ '^' };
+		~unique_operations() = delete;
+	}; // namespace defined_ops
+
 } // namespace mg

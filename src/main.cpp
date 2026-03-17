@@ -1,4 +1,5 @@
 #include <iostream>
+#include "operation.hpp"
 #include "operator_action.hpp"
 #include "parameter.hpp"
 
@@ -9,8 +10,7 @@ int main()
 	mg::number n{ "3.14" };
 	mg::variable v{ "x" };
 	mg::parameter p("p", { n });
-	mg::operation add("+");
-	mg::operator_action pa(p, add, { n });
-	std::cout << "'" << pa.left().as_number() << "'\n";
+	mg::operator_action pa(p, mg::unique_operations::add, { n });
+	std::cout << "'" << std::get<mg::number>(pa.compute()) << "'\n";
 	return 0;
 }

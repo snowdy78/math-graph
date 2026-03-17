@@ -24,7 +24,7 @@ namespace mg
 		}
 
 	public:
-		number(string_type num_str)
+		number(const string_type &num_str)
 			: m_value(std::stod(parse(num_str)))
 		{}
 		number(double n)
