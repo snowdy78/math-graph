@@ -18,13 +18,13 @@ namespace mg
 		{
 			try
 			{
-				return variable(value.c_str());
+				return variable(value);
 			}
 			catch (std::runtime_error &)
 			{
 				try
 				{
-					return number(value.c_str());
+					return number(value);
 				}
 				catch (std::runtime_error &err)
 				{

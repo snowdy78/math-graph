@@ -5,6 +5,7 @@
 #include "unresolved_expression.hpp"
 #include <array>
 #include <optional>
+#include <iostream>
 
 namespace mg
 {
@@ -14,25 +15,20 @@ namespace mg
 		using result_type = std::variant<unresolved_expression, number>;
 
 	private:
-		constexpr static const char *s_operator_action_pattern = "(.+)( +)(.)( +)(.+)";
+		constexpr static const char *s_operator_action_pattern = R"((.+)(\s+)(.)(\s+)(.+))";
 		constexpr static const char *s_function_action_pattern = "";
 		void parse(const string_type &str)
 		{
 			std::regex op_rgx(s_operator_action_pattern);
-			if (!std::regex_match(str, op_rgx))
+			std::smatch match;
+			if (!std::regex_search(str, match, op_rgx))
 			{
 				throw std::runtime_error("unable to create expression by '" + str + "'");
 			}
-			sstream_type ss(str);
-			std::array<string_type, 3> words;
-			string_type word;
-			for (size_t i = 0; i < words.size(); i++, ss >> word)
-			{
-				words[i] = word;
-			}
-			m_left	= words[0];
-			m_op	= &operation::get_by_name(words[1][0]);
-			m_right = words[2];
+			std::array<string_type, 3> words = { match[1], match[3], match[5] };
+			m_left							 = words[0];
+			m_op							 = &operation::get_by_name(words[1][0]);
+			m_right							 = words[2];
 		}
 		std::optional<unnamed_parameter> m_left, m_right;
 		const operation *m_op = nullptr;
