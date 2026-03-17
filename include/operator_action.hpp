@@ -5,7 +5,6 @@
 #include "unresolved_expression.hpp"
 #include <array>
 #include <optional>
-#include <iostream>
 
 namespace mg
 {
