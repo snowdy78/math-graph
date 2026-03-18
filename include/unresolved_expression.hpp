@@ -1,9 +1,9 @@
 #pragma once
 
 #include "mgraphfwd.hpp"
+#include "pure_output.hpp"
 #include "unnamed_parameter.hpp"
 #include "operation.hpp"
-#include <optional>
 
 namespace mg
 {
@@ -17,7 +17,7 @@ namespace mg
 			{}
 
 			unnamed_parameter curr_param;
-			const operation *op = nullptr;
+			const operation *op;
 		};
 		std::vector<expression_item> m_exprs{};
 
@@ -26,13 +26,39 @@ namespace mg
 		{
 			m_exprs.emplace_back(unnamed_parameter(var));
 		}
-		unresolved_expression(const unnamed_parameter &, const unresolved_expression &unr_exp) {}
+		unresolved_expression(unresolved_expression &&unr_exp, const unnamed_parameter &param)
+		{
+			m_exprs = std::move(unr_exp.m_exprs);
+			m_exprs.emplace_back(param);
+		}
 
 		unresolved_expression &push(const operation &prev_do_for, const unnamed_parameter &param)
 		{
 			m_exprs.back().op = &prev_do_for;
 			m_exprs.push_back(param);
 			return *this;
+		}
+		string_type str(const string_type &delimiter = "") const
+		{
+			string_type result;
+			for (auto i = m_exprs.begin(); i != m_exprs.end(); ++i)
+			{
+				if (i->curr_param.is_number())
+				{
+					result += to_pure_string(i->curr_param.as_number());
+				}
+				else
+				{
+					result += i->curr_param.as_variable().name();
+				}
+				if (i->op)
+				{
+					result += delimiter;
+					result += i->op->get();
+					result += delimiter;
+				}
+			}
+			return result;
 		}
 	};
 } // namespace mg

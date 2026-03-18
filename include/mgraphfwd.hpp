@@ -17,7 +17,6 @@ namespace mg
 	class action;
 	class unresolved_expression;
 	class expression;
-	class string_expression;
 
 	using var = variable;
 	using prm = parameter;
