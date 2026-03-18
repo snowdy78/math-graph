@@ -3,9 +3,8 @@
 #include "mgraphfwd.hpp"
 #include "number.hpp"
 #include <stdexcept>
-#include <map>
+#include <unordered_map>
 #include <functional>
-#include <list>
 
 namespace mg
 {
