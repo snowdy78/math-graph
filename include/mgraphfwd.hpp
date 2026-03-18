@@ -10,7 +10,6 @@ namespace mg
 	using cstring_type = const char_type *;
 	class number;
 	class variable;
-	class parameter;
 	class operation;
 	class function;
 	class operator_action;
@@ -19,5 +18,5 @@ namespace mg
 	class expression;
 
 	using var = variable;
-	using prm = parameter;
+
 } // namespace mg
