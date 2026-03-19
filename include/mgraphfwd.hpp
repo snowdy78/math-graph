@@ -14,7 +14,6 @@ namespace mg
 	class function;
 	class operator_action;
 	class action;
-	class unresolved_expression;
 	class expression;
 
 	using var = variable;
