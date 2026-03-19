@@ -1,16 +1,54 @@
 #pragma once
 
 #include "mgraphfwd.hpp"
-#include "unnamed_parameter.hpp"
+#include "independent_variable.hpp"
+#include <initializer_list>
+#include <regex>
+#include <functional>
 
 namespace mg
 {
-
 	class function
 	{
-		constexpr static const char *s_pattern					= R"(^([a-zA-Z0-9]*)\((.*)\)$)";
-		constexpr static const char *s_param_separation_pattern = R"(\s*,\s*)";
+	public:
+		using return_type	= number;
+		using params_type	= map_dependencies;
+		using function_type = std::function<return_type(const params_type &)>;
 
+		function(const string_type &decl_str, const function_type &f)
+			: m_func(f)
+		{
+			parse(decl_str);
+		}
+		function(const string_type &name, set_dependencies &&args, const function_type &f)
+			: m_name(name),
+			  m_args(std::move(args)),
+			  m_func(f)
+		{}
+		const string_type &name() const
+		{
+			return m_name;
+		}
+		size_t arg_count() const
+		{
+			return m_args.size();
+		}
+		const set_dependencies &args() const
+		{
+			return m_args;
+		}
+		return_type operator()(const map_dependencies &args) const
+		{
+			if (std::any_of(args.begin(), args.end(), [&](const auto &arg) {
+					return !m_args.contains(arg.first);
+				}))
+			{
+				throw std::runtime_error("unknown argument in function '" + m_name + "'");
+			}
+			return m_func(args);
+		}
+
+	private:
 		void parse(const string_type &func_str)
 		{
 			std::regex rgx(s_pattern);
@@ -25,20 +63,22 @@ namespace mg
 			string_type params_str = match[2];
 			std::sregex_token_iterator it(params_str.begin(), params_str.end(), sep_rgx, -1);
 			std::sregex_token_iterator reg_end;
-
 			for (; it != reg_end; ++it)
 			{
-				m_params.emplace_back(it->str());
+				if (m_args.contains({ it->str() }))
+				{
+					throw std::runtime_error("duplicate argument '" + it->str() + "' in function '" + m_name + "'");
+				}
+				m_args.insert({ it->str() });
 			}
 		}
-		string_type m_name;
-		std::vector<unnamed_parameter> m_params;
 
-	public:
-		function(const string_type &str);
-		function(const string_type &name, const std::initializer_list<unnamed_parameter> &params)
-			: m_name(name),
-			  m_params(params.begin(), params.end())
-		{}
+	private:
+		constexpr static const char *s_pattern					= R"(^([a-zA-Z0-9]*)\((.*)\)$)";
+		constexpr static const char *s_param_separation_pattern = R"(\s*,\s*)";
+
+		string_type m_name;
+		set_dependencies m_args; // function arguments
+		function_type m_func;
 	};
 } // namespace mg
