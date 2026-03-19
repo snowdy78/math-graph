@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mgraphfwd.hpp"
+#include "independent_variable.hpp"
 #include "operator_action.hpp"
 #include "function.hpp"
 #include <variant>
@@ -9,14 +9,42 @@ namespace mg
 {
 	class action
 	{
-		std::variant<operator_action, function> m_action;
-
 	public:
-		action(const operator_action &op_act)
-			: m_action(op_act)
+		using action_type		 = std::variant<operator_action, function>;
+		using forward_value_type = std::variant<number, independent_variable>;
+		action(const action_type &act)
+			: m_action(act)
 		{}
-		action(const function &f)
-			: m_action(f)
-		{}
+		bool is_operator_action() const
+		{
+			return std::holds_alternative<operator_action>(m_action);
+		}
+		bool is_function() const
+		{
+			return std::holds_alternative<function>(m_action);
+		}
+		const operator_action &as_operation() const
+		{
+			return std::get<operator_action>(m_action);
+		}
+		const function &as_function() const
+		{
+			return std::get<function>(m_action);
+		}
+		const set_dependencies &deps() const
+		{
+			if (is_function())
+			{
+				return std::get<function>(m_action).args();
+			}
+			if (is_operator_action())
+			{
+				return std::get<operator_action>(m_action).deps();
+			}
+			throw std::runtime_error("unknown action type");
+		}
+
+	private:
+		action_type m_action;
 	};
 } // namespace mg
