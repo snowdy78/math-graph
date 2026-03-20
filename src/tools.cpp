@@ -49,7 +49,7 @@ namespace mg
 			}
 			return operation::get_compute_map()[&opact.op()](nums[0], nums[1]);
 		}
-		throw std::runtime_error("count of values for action resolving is to much");
+		throw std::runtime_error("too much arguments for action resolving");
 	}
 	operator_action::forward_type create_parameter_data(const string_type &value)
 	{
