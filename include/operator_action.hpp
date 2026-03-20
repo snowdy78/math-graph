@@ -17,13 +17,41 @@ namespace mg
 
 	private:
 		void parse(const string_type &str);
+		// returns true, if operand has pointer to this action
+		bool has_recursive_reference(const forward_type &operand) const
+		{
+			return std::holds_alternative<pointer_type>(operand) && std::get<pointer_type>(operand) == this;
+		}
+		void find_and_insert_deps(const std::optional<forward_type> &operand)
+		{
+			if (!operand.has_value())
+			{
+				throw std::runtime_error("unable to update dependencies of action by given null");
+			}
+			if (std::holds_alternative<variable_type>(*operand))
+			{
+				m_deps.insert(std::get<variable_type>(*operand));
+			}
+			else if (std::holds_alternative<pointer_type>(*operand))
+			{
+				auto &other_deps = std::get<pointer_type>(*operand)->deps();
+				m_deps.insert(other_deps.begin(), other_deps.end());
+			}
+		}
 
 	public:
 		operator_action(const forward_type &opleft, const operation &op, const forward_type &opright)
 			: m_left(opleft),
 			  m_right(opright),
 			  m_op(&op)
-		{}
+		{
+			if (has_recursive_reference(opleft) || has_recursive_reference(opright))
+			{
+				throw std::runtime_error("unable to create operator action with itself reference");
+			}
+			find_and_insert_deps(opleft);
+			find_and_insert_deps(opright);
+		}
 		operator_action(const string_type &action_str)
 		{
 			parse(action_str);

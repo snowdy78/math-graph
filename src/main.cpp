@@ -3,6 +3,7 @@
 #include "independent_variable.hpp"
 #include "action.hpp"
 #include "expression.hpp"
+#include "operation.hpp"
 #include "tools.hpp"
 
 int main()
@@ -10,10 +11,11 @@ int main()
 	mg::number n{ "3.14" };
 	mg::independent_variable x{ "x" };
 	mg::operator_action pa("2 + x");
+	mg::operator_action pa2(n, mg::unique_operations::mul, &pa);
 	auto result = mg::get_result(
 		{
-			pa
-	   },
+			pa2
+	},
 		{ { x, n } }
 	);
 	if (std::holds_alternative<mg::action>(result))

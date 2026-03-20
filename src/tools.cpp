@@ -25,14 +25,14 @@ namespace mg
 			for (size_t i = 0; i < n; ++i)
 			{
 				auto &value = v[i];
-				if (std::holds_alternative<independent_variable>(value))
+				if (std::holds_alternative<operator_action::variable_type>(value))
 				{
-					nums[i] = values.at(std::get<independent_variable>(value));
+					nums[i] = values.at(std::get<operator_action::variable_type>(value));
 					continue;
 				}
-				if (std::holds_alternative<number>(value))
+				if (std::holds_alternative<operator_action::number_type>(value))
 				{
-					nums[i] = std::get<number>(value);
+					nums[i] = std::get<operator_action::number_type>(value);
 					continue;
 				}
 				// value is inner action that way
@@ -42,10 +42,7 @@ namespace mg
 				{
 					return act;
 				}
-				else
-				{
-					nums[i] = std::get<number>(value);
-				}
+				nums[i] = std::get<number>(res);
 			}
 			return operation::get_compute_map()[&opact.op()](nums[0], nums[1]);
 		}
