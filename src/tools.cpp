@@ -4,26 +4,6 @@
 
 namespace mg
 {
-	std::variant<action, number>
-	get_dependency_value(const map_dependencies &args, const operator_action::forward_type &value)
-	{
-		if (std::holds_alternative<independent_variable>(value))
-		{
-			number x = args.at(std::get<independent_variable>(value));
-			return x;
-		}
-		else if (std::holds_alternative<number>(value))
-		{
-			return std::get<number>(value);
-		}
-		auto res = get_result({ *std::get<const operator_action *>(value) }, args);
-		if (std::holds_alternative<action>(res))
-		{
-			return res;
-		}
-		return std::get<number>(res);
-	}
-
 	std::variant<action, number> get_result(const action &act, const map_dependencies &values)
 	{
 		auto deps = act.deps();
@@ -44,11 +24,23 @@ namespace mg
 			operator_action::forward_type v[n] = { opact.left(), opact.right() };
 			for (size_t i = 0; i < n; ++i)
 			{
-				auto value = get_dependency_value(values, v[i]);
-
-				if (std::holds_alternative<action>(value))
+				auto &value = v[i];
+				if (std::holds_alternative<independent_variable>(value))
 				{
-					return value;
+					nums[i] = values.at(std::get<independent_variable>(value));
+					continue;
+				}
+				if (std::holds_alternative<number>(value))
+				{
+					nums[i] = std::get<number>(value);
+					continue;
+				}
+				// value is inner action that way
+				// and start recursion by this action
+				auto res = get_result({ *std::get<operator_action::pointer_type>(value) }, values);
+				if (std::holds_alternative<action>(res))
+				{
+					return act;
 				}
 				else
 				{

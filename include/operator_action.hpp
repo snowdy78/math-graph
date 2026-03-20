@@ -10,7 +10,10 @@ namespace mg
 	class operator_action
 	{
 	public:
-		using forward_type = std::variant<number, independent_variable, const operator_action *>;
+		using number_type	= number;
+		using variable_type = independent_variable;
+		using pointer_type	= const operator_action *;
+		using forward_type	= std::variant<number_type, variable_type, pointer_type>;
 
 	private:
 		void parse(const string_type &str);
