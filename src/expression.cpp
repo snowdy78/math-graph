@@ -19,8 +19,8 @@ namespace mg
 	}
 	expression &expression::apply(const function &f)
 	{
-		auto args = f.args();
-		m_deps.merge(args);
+		auto &args = f.args();
+		m_deps.insert(args.begin(), args.end());
 		m_items.emplace_back(f);
 		return *this;
 	}
