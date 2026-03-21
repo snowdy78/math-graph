@@ -17,12 +17,24 @@ TEST_CASE("construct number", "[.number]")
 		REQUIRE(n == 2.0);
 		n = { "2." };
 		REQUIRE(n == 2.0);
+		n = { ".0" };
+		REQUIRE(n == 0.0);
 	}
 	SECTION("error construction")
 	{
 		try
 		{
+			mg::number n{ "." }; // does not to be a 0.0, should throw an exception!
+			REQUIRE(false);
+		}
+		catch (std::exception &err)
+		{
+			REQUIRE(true);
+		}
+		try
+		{
 			mg::number n{ "_2.0" };
+			REQUIRE(false);
 		}
 		catch (std::exception &err)
 		{
@@ -31,6 +43,7 @@ TEST_CASE("construct number", "[.number]")
 		try
 		{
 			mg::number n{ "a" };
+			REQUIRE(false);
 		}
 		catch (std::exception &err)
 		{

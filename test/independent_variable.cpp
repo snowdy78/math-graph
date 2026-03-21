@@ -17,6 +17,7 @@ TEST_CASE("independent_variable construct", "[.independent_variable]")
 		{
 
 			mg::independent_variable x{ "1" };
+			REQUIRE(false);
 		}
 		catch (std::exception &err)
 		{
@@ -25,6 +26,7 @@ TEST_CASE("independent_variable construct", "[.independent_variable]")
 		try
 		{
 			mg::independent_variable x{ "1a" };
+			REQUIRE(false);
 		}
 		catch (std::exception &err)
 		{
@@ -33,6 +35,7 @@ TEST_CASE("independent_variable construct", "[.independent_variable]")
 		try
 		{
 			mg::independent_variable x{ "_x" };
+			REQUIRE(false);
 		}
 		catch (std::exception &err)
 		{
