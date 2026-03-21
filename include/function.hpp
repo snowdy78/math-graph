@@ -45,6 +45,10 @@ namespace mg
 			{
 				throw std::runtime_error("unknown argument in function '" + m_name + "'");
 			}
+			if (args.size() > m_args.size())
+			{
+				throw std::runtime_error("too many arguments in function '" + m_name + "'");
+			}
 			return m_func(args);
 		}
 
