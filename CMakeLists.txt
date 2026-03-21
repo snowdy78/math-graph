@@ -13,8 +13,8 @@ include(FetchContent)
 
 file(GLOB_RECURSE PROGRAM_HEADER_FILES "include/*.hpp" "include/*.h")
 file(GLOB_RECURSE PROGRAM_SOURCE_FILES "src/*.cpp")
-
-add_executable(${PROGRAM_NAME} ${PROGRAM_SOURCE_FILES})
+list(REMOVE_ITEM PROGRAM_SOURCE_FILES "${PROJECT_SOURCE_DIR}/src/main.cpp")
+add_executable(${PROGRAM_NAME} "src/main.cpp" ${PROGRAM_SOURCE_FILES})
 
 target_include_directories(${PROGRAM_NAME} PRIVATE include)
 

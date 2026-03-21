@@ -34,7 +34,7 @@ target_include_directories(${TEST_TOOLS} PUBLIC ${PROJECT_SOURCE_DIR}/test/tools
 
 function(add_catch2_test TARGET SOURCE_FILE)
 
-    add_executable(${TARGET} ${SOURCE_FILE})
+    add_executable(${TARGET} ${SOURCE_FILE} ${PROGRAM_SOURCE_FILES})
     set_target_properties(${TARGET} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/test)
     set_target_properties(${TARGET} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/build/test)
     set_target_properties(${TARGET} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/build/test)
