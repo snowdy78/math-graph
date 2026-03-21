@@ -16,7 +16,7 @@ namespace mg
 			= std::unordered_map<const operation *, std::function<number(const number &, const number &)>>;
 
 	private:
-		constexpr static const char *s_pattern = "*-+/^";
+		constexpr static const char *s_pattern = R"(^[\*\-\+\/\^]$)";
 		constexpr static key_type parse(const key_type &op)
 		{
 			std::string allowed(s_pattern);
