@@ -13,34 +13,9 @@ TEST_CASE("independent_variable construct", "[.independent_variable]")
 	}
 	SECTION("parse error")
 	{
-		try
-		{
-
-			mg::independent_variable x{ "1" };
-			REQUIRE(false);
-		}
-		catch (std::exception &err)
-		{
-			REQUIRE(true);
-		}
-		try
-		{
-			mg::independent_variable x{ "1a" };
-			REQUIRE(false);
-		}
-		catch (std::exception &err)
-		{
-			REQUIRE(true);
-		}
-		try
-		{
-			mg::independent_variable x{ "_x" };
-			REQUIRE(false);
-		}
-		catch (std::exception &err)
-		{
-			REQUIRE(true);
-		}
+		REQUIRE_THROWS(mg::independent_variable{ "1" });
+		REQUIRE_THROWS(mg::independent_variable{ "1a" });
+		REQUIRE_THROWS(mg::independent_variable{ "_x" });
 	}
 }
 TEST_CASE("independent_variable ", "[.independent_variable]")
