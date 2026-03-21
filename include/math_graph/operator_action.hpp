@@ -34,7 +34,12 @@ namespace mg
 			}
 			else if (std::holds_alternative<pointer_type>(*operand))
 			{
-				auto &other_deps = std::get<pointer_type>(*operand)->deps();
+				auto &other_action = std::get<pointer_type>(*operand);
+				if (!other_action)
+				{
+					throw std::runtime_error("unable to update dependencies of action by null pointer");
+				}
+				auto &other_deps = other_action->deps();
 				m_deps.insert(other_deps.begin(), other_deps.end());
 			}
 		}
