@@ -8,7 +8,7 @@ namespace mg
 {
 	class number
 	{
-		constexpr static const char *s_pattern = R"(^(\d+(\.\d*)?|\.\d+)$)";
+		constexpr static const char *s_pattern = R"(^([-+]?)(\d+(\.\d*)?|\.\d+)$)";
 		double m_value;
 
 	private:

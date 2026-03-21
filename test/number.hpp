@@ -20,6 +20,8 @@ TEST_CASE("construct number", "[test]")
 		REQUIRE(n == 2.0);
 		n = { ".0" };
 		REQUIRE(n == 0.0);
+		n = { "-1" };
+		REQUIRE(n == -1);
 	}
 	SECTION("error construction")
 	{
