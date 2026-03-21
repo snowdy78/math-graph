@@ -61,6 +61,8 @@ namespace mg
 			m_name = match[1];
 			std::regex sep_rgx(s_param_separation_pattern);
 			string_type params_str = match[2];
+			if (params_str.empty())
+				throw std::runtime_error("function '" + func_str + "' has no arguments");
 			std::sregex_token_iterator it(params_str.begin(), params_str.end(), sep_rgx, -1);
 			std::sregex_token_iterator reg_end;
 			for (; it != reg_end; ++it)
