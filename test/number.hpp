@@ -1,8 +1,9 @@
+
 #include <catch2/catch_test_macros.hpp>
 
-#include "number.hpp"
+#include "math_graph/number.hpp"
 
-TEST_CASE("construct number", "[.number]")
+TEST_CASE("construct number", "[test]")
 {
 	SECTION("construct by number")
 	{
@@ -27,7 +28,7 @@ TEST_CASE("construct number", "[.number]")
 		REQUIRE_THROWS(mg::number{ "a" });
 	}
 }
-TEST_CASE("operations with number", "[.number]")
+TEST_CASE("operations with number", "[test]")
 {
 	SECTION("add")
 	{

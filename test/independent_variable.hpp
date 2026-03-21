@@ -1,7 +1,8 @@
-#include <catch2/catch_test_macros.hpp>
-#include "independent_variable.hpp"
 
-TEST_CASE("independent_variable construct", "[.independent_variable]")
+#include <catch2/catch_test_macros.hpp>
+#include "math_graph/independent_variable.hpp"
+
+TEST_CASE("independent_variable construct", "[test]")
 {
 	SECTION("construct by name")
 	{
@@ -18,7 +19,7 @@ TEST_CASE("independent_variable construct", "[.independent_variable]")
 		REQUIRE_THROWS(mg::independent_variable{ "_x" });
 	}
 }
-TEST_CASE("independent_variable ", "[.independent_variable]")
+TEST_CASE("independent_variable ", "[test]")
 {
 	mg::independent_variable x{ "x" };
 	REQUIRE(x.name() == "x");

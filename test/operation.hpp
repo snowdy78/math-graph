@@ -1,8 +1,9 @@
+
 #include <catch2/catch_test_macros.hpp>
 
-#include "operation.hpp"
+#include "math_graph/operation.hpp"
 
-TEST_CASE("operation use", "[.operation]")
+TEST_CASE("operation use", "[test]")
 {
 	SECTION("use base operations")
 	{

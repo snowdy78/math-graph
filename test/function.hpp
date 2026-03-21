@@ -1,8 +1,9 @@
+
 #include <catch2/catch_test_macros.hpp>
-#include "function.hpp"
+#include "math_graph/function.hpp"
 #include <cmath>
 
-TEST_CASE("function construct", "[.function]")
+TEST_CASE("function construct", "[test]")
 {
 	SECTION("construct by string")
 	{
@@ -106,7 +107,7 @@ TEST_CASE("function construct", "[.function]")
 		}
 	}
 }
-TEST_CASE("function call", "[.function]")
+TEST_CASE("function call", "[test]")
 {
 	SECTION("correct args")
 	{
