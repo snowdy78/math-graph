@@ -1,5 +1,5 @@
-#include "expression.hpp"
-#include "action.hpp"
+#include "math_graph/expression.hpp"
+#include "math_graph/action.hpp"
 
 namespace mg
 {

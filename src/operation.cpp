@@ -1,4 +1,4 @@
-#include "operation.hpp"
+#include "math_graph/operation.hpp"
 #include <cmath>
 namespace mg
 {

@@ -1,10 +1,9 @@
 #include <iostream>
 #include <variant>
-#include "independent_variable.hpp"
-#include "action.hpp"
-#include "expression.hpp"
-#include "operation.hpp"
-#include "tools.hpp"
+#include "math_graph/action.hpp"
+#include "math_graph/expression.hpp"
+#include "math_graph/operation.hpp"
+#include "math_graph/tools.hpp"
 
 int main()
 {

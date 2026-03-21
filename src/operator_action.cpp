@@ -1,5 +1,5 @@
-#include "operator_action.hpp"
-#include "tools.hpp"
+#include "math_graph/action.hpp"
+#include "math_graph/tools.hpp"
 
 namespace mg
 {

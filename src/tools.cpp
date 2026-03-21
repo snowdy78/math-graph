@@ -1,6 +1,6 @@
-#include "tools.hpp"
-#include "action.hpp"
-#include "operation.hpp"
+#include "math_graph/tools.hpp"
+#include "math_graph/action.hpp"
+#include "math_graph/operation.hpp"
 
 namespace mg
 {
