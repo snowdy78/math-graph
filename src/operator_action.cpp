@@ -10,8 +10,9 @@ namespace mg
 		{
 			throw std::runtime_error("unable to create expression by '" + str + "'");
 		}
-		string_type words[] = { match[1], match[3], match[5] };
-		m_left				= create_parameter_data(words[0]);
+		string_type words[]
+			= { match[2].str().empty() ? match[3] : match[2], match[4], match[6].str().empty() ? match[7] : match[6] };
+		m_left = create_parameter_data(words[0]);
 		if (std::holds_alternative<independent_variable>(*m_left))
 		{
 			m_deps.insert(std::get<independent_variable>(*m_left));

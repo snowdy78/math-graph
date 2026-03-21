@@ -35,15 +35,52 @@ TEST_CASE("operator_action construct", "[test]")
 			REQUIRE(std::holds_alternative<mg::operator_action::variable_type>(op.left()));
 			REQUIRE(std::holds_alternative<mg::operator_action::variable_type>(op.right()));
 		}
-		SECTION("by negative number")
+		SECTION("with brackets")
 		{
-			mg::operator_action op{ "-1 + 2" };
-			REQUIRE(op.op() == mg::unique_operations::add);
-			REQUIRE(op.deps().size() == 0);
-			REQUIRE(std::holds_alternative<mg::operator_action::number_type>(op.left()));
-			REQUIRE(std::holds_alternative<mg::operator_action::number_type>(op.right()));
-			REQUIRE(std::get<mg::operator_action::number_type>(op.left()) == -1.0);
-			REQUIRE(std::get<mg::operator_action::number_type>(op.right()) == 2.0);
+			SECTION("for numbers")
+			{
+				auto check_parsing = [](mg::string_type str, mg::number n1, mg::number n2) {
+					mg::operator_action op{ str };
+					REQUIRE(op.op() == mg::unique_operations::add);
+					REQUIRE(op.deps().size() == 0);
+					REQUIRE(std::holds_alternative<mg::operator_action::number_type>(op.left()));
+					REQUIRE(std::holds_alternative<mg::operator_action::number_type>(op.right()));
+					REQUIRE(std::get<mg::operator_action::number_type>(op.left()) == n1);
+					REQUIRE(std::get<mg::operator_action::number_type>(op.right()) == n2);
+				};
+				check_parsing("-1+2.0", -1.0, 2.0);
+				check_parsing("1+(-1)", 1.0, -1.0);
+				check_parsing("1+(+1)", 1.0, 1.0);
+				check_parsing("1+(1)", 1.0, 1.0);
+				check_parsing("(-1) + (-1.0)", -1.0, -1.0);
+				check_parsing("(1) + (1.0)", 1.0, 1.0);
+				check_parsing("-1.0 + (1)", -1.0, 1.0);
+				REQUIRE_THROWS(mg::operator_action{ "1 - -1" });
+				REQUIRE_THROWS(mg::operator_action{ "1--1" });
+				REQUIRE_THROWS(mg::operator_action{ "1+-1" });
+			}
+			SECTION("for vars")
+			{
+				auto check_parsing = [](mg::string_type str, mg::string_type name1, mg::string_type name2) {
+					mg::operator_action op{ str };
+					REQUIRE(op.op() == mg::unique_operations::add);
+					REQUIRE(op.deps().size() == 2);
+					REQUIRE(op.deps().contains({ name1 }));
+					REQUIRE(op.deps().contains({ name2 }));
+					REQUIRE(std::holds_alternative<mg::operator_action::variable_type>(op.left()));
+					REQUIRE(std::holds_alternative<mg::operator_action::variable_type>(op.right()));
+				};
+				check_parsing("(x1) + (x2)", "x1", "x2");
+				check_parsing("x1+(x2)", "x1", "x2");
+				check_parsing("(x1)+a2", "x1", "a2");
+				REQUIRE_THROWS(mg::operator_action{ "+x1 + (x3)" });
+				REQUIRE_THROWS(mg::operator_action{ "(-x1) + (-x2)" });
+				REQUIRE_THROWS(mg::operator_action{ "-x1 - x2" });
+				REQUIRE_THROWS(mg::operator_action{ "x1+(+x2)" });
+				REQUIRE_THROWS(mg::operator_action{ "x1 - -x2" });
+				REQUIRE_THROWS(mg::operator_action{ "x1--x2" });
+				REQUIRE_THROWS(mg::operator_action{ "x1+-x2" });
+			}
 		}
 	}
 	SECTION("construct by incorrect string")
