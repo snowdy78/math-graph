@@ -3,6 +3,4 @@
 TEST_CASE("test", "[test]")
 {
 	REQUIRE(1 == 1);
-	REQUIRE(2 == 2);
-	CAPTURE(2);
 }
