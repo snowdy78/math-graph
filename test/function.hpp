@@ -25,84 +25,66 @@ TEST_CASE("function construct", "[test]")
 			REQUIRE(pow.args().size() == 2);
 			REQUIRE(pow.args().contains({ "x1" }));
 			REQUIRE(pow.args().contains({ "x2" }));
-			mg::function f{ "f1(x, x1, )", [](const mg::map_dependencies &args) -> mg::function::return_type {
-							   return 1.0;
-						   } };
-			REQUIRE(f.name() == "f1");
-			REQUIRE(f.args().size() == 2);
-			REQUIRE(f.args().contains({ "x" }));
-			REQUIRE(f.args().contains({ "x1" }));
 		}
 		SECTION("incorrect name")
 		{
-			try
-			{
-				mg::function sqrt{ "_f1(x)", [](const mg::map_dependencies &args) -> mg::function::return_type {
-									  return std::sqrt(args.at({ "x" }));
-								  } };
-				REQUIRE(false);
-			}
-			catch (std::exception &err)
-			{
-				REQUIRE(true);
-			}
+			REQUIRE_THROWS(mg::function{ "_f1(x)", [](const mg::map_dependencies &args) -> mg::function::return_type {
+											return std::sqrt(args.at({ "x" }));
+										} });
 		}
 		SECTION("incorrect args")
 		{
 			SECTION("no args")
-			try
 			{
-				mg::function sqrt{ "f1()", [](const mg::map_dependencies &args) -> mg::function::return_type {
-									  return std::sqrt(args.at({ "x" }));
-								  } };
-				REQUIRE(false);
-			}
-			catch (std::exception &err)
-			{
-				REQUIRE(true);
+				REQUIRE_THROWS(mg::function{ "f1()", [](const mg::map_dependencies &args) -> mg::function::return_type {
+												return std::sqrt(args.at({ "x" }));
+											} });
 			}
 			SECTION("wrong args")
 			{
-				try
-				{
-					mg::function sqrt{ "f1(124121)", [](const mg::map_dependencies &args) -> mg::function::return_type {
-										  return std::sqrt(args.at({ "x" }));
-									  } };
-					REQUIRE(false);
-				}
-				catch (std::exception &err)
-				{
-					REQUIRE(true);
-				}
+				REQUIRE_THROWS(mg::function{ "f1(124121)",
+											 [](const mg::map_dependencies &args) -> mg::function::return_type {
+												 return std::sqrt(args.at({ "x" }));
+											 } });
 			}
 			SECTION("same args")
 			{
-				try
-				{
-					mg::function sqrt{ "f1(x, x)", [](const mg::map_dependencies &args) -> mg::function::return_type {
-										  return std::sqrt(args.at({ "x" }));
-									  } };
-					REQUIRE(false);
-				}
-				catch (std::exception &err)
-				{
-					REQUIRE(true);
-				}
+				REQUIRE_THROWS(mg::function{ "f1(x, x)",
+											 [](const mg::map_dependencies &args) -> mg::function::return_type {
+												 return std::sqrt(args.at({ "x" }));
+											 } });
+			}
+			SECTION("comma without argument")
+			{
+
+				REQUIRE_THROWS(mg::function{ "f1(x, x, )",
+											 [](const mg::map_dependencies &args) -> mg::function::return_type {
+												 return std::sqrt(args.at({ "x" }));
+											 } });
+
+				REQUIRE_THROWS(mg::function{ "f1(, x, x)",
+											 [](const mg::map_dependencies &args) -> mg::function::return_type {
+												 return std::sqrt(args.at({ "x" }));
+											 } });
+			}
+			SECTION("argument without comma")
+			{
+				REQUIRE_THROWS(mg::function{ "f1(a    c ,b)",
+											 [](const mg::map_dependencies &args) -> mg::function::return_type {
+												 return std::sqrt(args.at({ "x" }));
+											 } });
+
+				REQUIRE_THROWS(mg::function{ "f1(,,,)",
+											 [](const mg::map_dependencies &args) -> mg::function::return_type {
+												 return std::sqrt(args.at({ "x" }));
+											 } });
 			}
 			SECTION("wrong arg names")
 			{
-				try
-				{
-					mg::function sqrt{ "f1(x, x_b, x_c, y)",
-									   [](const mg::map_dependencies &args) -> mg::function::return_type {
-										   return std::sqrt(args.at({ "x" }));
-									   } };
-					REQUIRE(false);
-				}
-				catch (std::exception &err)
-				{
-					REQUIRE(true);
-				}
+				REQUIRE_THROWS(mg::function{ "f1(x, x_b, x_c, y)",
+											 [](const mg::map_dependencies &args) -> mg::function::return_type {
+												 return std::sqrt(args.at({ "x" }));
+											 } });
 			}
 		}
 	}
