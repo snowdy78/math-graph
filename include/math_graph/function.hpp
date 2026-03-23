@@ -55,33 +55,32 @@ namespace mg
 	private:
 		void parse(const string_type &func_str)
 		{
-			std::regex rgx(s_pattern);
+			std::regex rgx(s_syntax_pattern);
 			std::smatch match;
 			if (!std::regex_search(func_str, match, rgx))
 			{
-				throw std::runtime_error("unable to create a function by '" + func_str + "'");
+				throw std::runtime_error("Invalid Function Syntax: Unable to create a function by '" + func_str + "'");
 			}
-			// match data will be 0: full match, 1: func name, 2: param_list inside brackets
-			m_name = match[1];
-			std::regex sep_rgx(s_param_separation_pattern);
+			m_name				   = match[1];
 			string_type params_str = match[2];
-			if (params_str.empty())
-				throw std::runtime_error("function '" + func_str + "' has no arguments");
-			std::sregex_token_iterator it(params_str.begin(), params_str.end(), sep_rgx, -1);
-			std::sregex_token_iterator reg_end;
+			// match data will be 0: full match, 1: func name, 2: param_list inside brackets
+			std::regex args_rgx(s_search_arg_pattern);
+			std::sregex_iterator it(params_str.begin(), params_str.end(), args_rgx);
+			std::sregex_iterator reg_end;
 			for (; it != reg_end; ++it)
 			{
 				if (m_args.contains({ it->str() }))
 				{
-					throw std::runtime_error("duplicate argument '" + it->str() + "' in function '" + m_name + "'");
+					throw std::runtime_error("Duplicate argument '" + it->str() + "' in function '" + m_name + "'");
 				}
 				m_args.insert({ it->str() });
 			}
 		}
 
 	private:
-		constexpr static const char *s_pattern					= R"(^([a-zA-Z0-9]*)\((.*)\)$)";
-		constexpr static const char *s_param_separation_pattern = R"(\s*,\s*)";
+		constexpr static const char *s_syntax_pattern
+			= R"(^\s*([a-zA-Z]+\d*)\s*\((\s*[a-zA-Z]+\d*(?:\s*,\s*[a-zA-Z]+\d*)*\s*)\)\s*$)";
+		constexpr static const char *s_search_arg_pattern = R"([a-zA-Z]+\d*)";
 
 		string_type m_name;
 		set_dependencies m_args; // function arguments
