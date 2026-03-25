@@ -35,5 +35,25 @@ namespace mg
 		{
 			return m_value;
 		}
+		number &operator+=(const number &other)
+		{
+			m_value += other.m_value;
+			return *this;
+		}
+		number &operator-=(const number &other)
+		{
+			m_value -= other.m_value;
+			return *this;
+		}
+		number &operator*=(const number &other)
+		{
+			m_value *= other.m_value;
+			return *this;
+		}
+		number &operator/=(const number &other)
+		{
+			m_value /= other.m_value;
+			return *this;
+		}
 	};
 } // namespace mg
