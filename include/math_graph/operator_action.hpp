@@ -80,7 +80,7 @@ namespace mg
 
 	private:
 		constexpr static const char *s_operator_action_pattern
-			= R"(^(\(([+-]?[a-zA-Z0-9.]+)\)|([+-]?[a-zA-Z0-9.]+))\s*(\S)\s*(\(([+-]?[a-zA-Z0-9.]+)\)|([a-zA-Z0-9.]+))$)";
+			= R"(^(\(([+-]?[a-zA-Z0-9_.]+)\)|([+-]?[a-zA-Z0-9_.]+))\s*(\S)\s*(\(([+-]?[a-zA-Z0-9_.]+)\)|([a-zA-Z0-9_.]+))$)";
 
 		set_dependencies m_deps;
 		std::optional<forward_type> m_left, m_right;

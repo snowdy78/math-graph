@@ -10,7 +10,7 @@ namespace mg
 {
 	class independent_variable
 	{
-		static string_type parse(const string_type &var_name)
+		string_type parse(const string_type &var_name)
 		{
 			std::regex rgx(s_pattern);
 			std::smatch match;
@@ -18,15 +18,32 @@ namespace mg
 			{
 				throw std::runtime_error("cannot create variable by '" + var_name + "'");
 			}
-			return match[0];
+			auto &numerator = match[3].str().empty() ? match[4] : match[3];
+			auto numstr		= numerator.str();
+			return match[1].str() + (numstr.empty() ? "" : "_" + numstr);
 		}
 
 	public:
 		independent_variable(const string_type &name)
-			: m_name(parse(name))
-		{}
+		{
+			rename(name);
+		}
 
-		const string_type &name() const
+		string_type name() const
+		{
+			auto sep = m_name.find('_');
+			if (sep == string_type::npos)
+				return m_name;
+			return m_name.substr(0, sep);
+		}
+		string_type numerator() const
+		{
+			auto sep = m_name.find('_');
+			if (sep == string_type::npos)
+				return "";
+			return m_name.substr(sep + 1);
+		}
+		const string_type &fullname() const
 		{
 			return m_name;
 		}
@@ -36,19 +53,19 @@ namespace mg
 		}
 		bool operator==(const independent_variable &other) const
 		{
-			return &other == this || m_name == other.m_name;
+			return &other == this || fullname() == other.fullname();
 		}
 		bool operator<=>(const independent_variable &other) const
 		{
-			if (m_name < other.m_name)
+			if (fullname() < other.fullname())
 				return -1;
-			if (m_name > other.m_name)
+			if (fullname() > other.fullname())
 				return 1;
 			return 0;
 		}
 
 	private:
-		constexpr static const char *s_pattern = "^[a-zA-Z][a-zA-Z0-9]*$";
+		constexpr static const char *s_pattern = R"(^([a-zA-Z])((\d*)|_([a-zA-Z]*\d*)?)$)";
 
 		string_type m_name;
 	};
@@ -57,7 +74,7 @@ namespace mg
 	{
 		std::size_t operator()(const independent_variable &v) const
 		{
-			return std::hash<std::string>{}(v.name());
+			return std::hash<std::string>{}(v.fullname());
 		}
 	};
 	using set_dependencies = std::unordered_set<independent_variable, variable_hasher>;
