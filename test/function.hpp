@@ -9,10 +9,10 @@ TEST_CASE("function construct", "[test]")
 	{
 		SECTION("correct name and args")
 		{
-			mg::function sqrt{ "f(x)", [](const mg::map_dependencies &args) -> mg::function::return_type {
+			mg::function sqrt{ "f1(x)", [](const mg::map_dependencies &args) -> mg::function::return_type {
 								  return std::sqrt(args.at({ "x" }));
 							  } };
-			REQUIRE(sqrt.name() == "f");
+			REQUIRE(sqrt.fullname() == "f_1");
 			REQUIRE(sqrt.args().size() == 1);
 			REQUIRE(sqrt.args().contains({ "x" }));
 		}
@@ -21,7 +21,7 @@ TEST_CASE("function construct", "[test]")
 			mg::function pow{ "f_a1(x1, x2)", [](const mg::map_dependencies &args) -> mg::function::return_type {
 								 return std::pow(args.at({ "x1" }), args.at({ "x2" }));
 							 } };
-			REQUIRE(pow.name() == "f_a1");
+			REQUIRE(pow.fullname() == "f_a1");
 			REQUIRE(pow.args().size() == 2);
 			REQUIRE(pow.args().contains({ "x1" }));
 			REQUIRE(pow.args().contains({ "x2" }));

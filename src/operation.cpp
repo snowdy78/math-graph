@@ -7,24 +7,32 @@ namespace mg
 		using arg_type				= const number &;
 		static compute_map_type map = {
 			{ &unique_operations::add,
-			  [](arg_type a, arg_type b) {
-				  return a + b;
+			  [](auto &vs) {
+				  return vs.at(0) + vs.at(1);
 			  } },
 			{ &unique_operations::sub,
-			  [](arg_type a, arg_type b) {
-				  return a - b;
+			  [](auto &vs) {
+				  return vs.at(0) - vs.at(1);
 			  } },
 			{ &unique_operations::mul,
-			  [](arg_type a, arg_type b) {
-				  return a * b;
+			  [](auto &vs) {
+				  return vs.at(0) * vs.at(1);
 			  } },
 			{ &unique_operations::div,
-			  [](arg_type a, arg_type b) {
-				  return a / b;
+			  [](auto &vs) {
+				  return vs.at(0) / vs.at(1);
 			  } },
 			{ &unique_operations::pow,
-			  [](arg_type a, arg_type b) {
-				  return std::pow(a, b);
+			  [](auto &vs) {
+				  return std::pow(vs.at(0), vs.at(1));
+			  } },
+			{ &unique_operations::plus,
+			  [](auto &vs) {
+				  return +vs.at(0);
+			  } },
+			{ &unique_operations::minus,
+			  [](auto &vs) {
+				  return -vs.at(0);
 			  } }
 		};
 		return map;

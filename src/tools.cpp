@@ -18,11 +18,10 @@ namespace mg
 				return act.as_function()(values);
 			}
 			// operator action otherwise
-			auto &opact						   = act.as_operation();
-			constexpr size_t n				   = 2;
-			number nums[n]					   = { 0.0, 0.0 };
-			operator_action::forward_type v[n] = { opact.left(), opact.right() };
-			for (size_t i = 0; i < n; ++i)
+			auto &opact									 = act.as_operation();
+			std::vector<number> nums					 = { 0.0, 0.0 };
+			std::vector<operator_action::forward_type> v = { opact.left(), opact.right() };
+			for (size_t i = 0; i < nums.size(); ++i)
 			{
 				auto &value = v[i];
 				if (std::holds_alternative<operator_action::variable_type>(value))
@@ -44,7 +43,7 @@ namespace mg
 				}
 				nums[i] = std::get<number>(res);
 			}
-			return operation::get_compute_map().at(&opact.op())(nums[0], nums[1]);
+			return operation::get_compute_map().at(&opact.op())(nums);
 		}
 		throw std::runtime_error("too much arguments for action resolving");
 	}

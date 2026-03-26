@@ -1,5 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
 #include "math_graph/operator_action.hpp"
+#include "math_graph/action.hpp"
 
 TEST_CASE("operator_action construct", "[test]")
 {
@@ -171,7 +172,7 @@ TEST_CASE("operator_action construct", "[test]")
 		}
 		SECTION("number and other operation")
 		{
-			mg::operator_action p{ "x + 2" };
+			mg::action p{ mg::operator_action{ "x + 2" } };
 			mg::operator_action op{ 1.0, mg::unique_operations::add, &p };
 			REQUIRE(op.op() == mg::unique_operations::add);
 			REQUIRE(op.deps().size() == 1);
@@ -183,7 +184,7 @@ TEST_CASE("operator_action construct", "[test]")
 		SECTION("var and other operation")
 		{
 			auto test = [](mg::string_type opact_string, mg::string_type var_name) {
-				mg::operator_action p{ opact_string };
+				mg::action p{ mg::operator_action{ opact_string } };
 				mg::independent_variable x{ var_name };
 				mg::operator_action op{ x, mg::unique_operations::add, &p };
 				REQUIRE(op.op() == mg::unique_operations::add);
@@ -216,7 +217,7 @@ TEST_CASE("operator_action construct", "[test]")
 		SECTION("operation and other operation")
 		{
 			auto test = [](mg::string_type opact_string, mg::string_type other_opact_string) {
-				mg::operator_action p{ opact_string }, x{ other_opact_string };
+				mg::action p{ mg::operator_action{ opact_string } }, x{ mg::operator_action{ other_opact_string } };
 				mg::operator_action op{ &x, mg::unique_operations::add, &p };
 				REQUIRE(op.op() == mg::unique_operations::add);
 				REQUIRE(std::holds_alternative<mg::operator_action::pointer_type>(op.left()));

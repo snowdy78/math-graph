@@ -11,9 +11,10 @@ namespace mg
 
 	class operation
 	{
-		using key_type = char_type;
-		using compute_map_type
-			= std::unordered_map<const operation *, std::function<number(const number &, const number &)>>;
+	public:
+		using key_type		   = char_type;
+		using function_type	   = std::function<number(const std::vector<number> &)>;
+		using compute_map_type = std::unordered_map<const operation *, function_type>;
 
 	private:
 		constexpr static const char *s_pattern = R"(^[\*\-\+\/\^]$)";
@@ -52,6 +53,8 @@ namespace mg
 		constexpr static operation mul{ '*' };
 		constexpr static operation div{ '/' };
 		constexpr static operation pow{ '^' };
+		constexpr static operation plus{ '+' };	 // unary plus
+		constexpr static operation minus{ '-' }; // unary minus
 		~unique_operations() = delete;
 	}; // namespace defined_ops
 

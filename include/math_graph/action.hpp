@@ -2,6 +2,7 @@
 
 #include "independent_variable.hpp"
 #include "operator_action.hpp"
+#include "unary_operation.hpp"
 #include "function.hpp"
 #include <variant>
 
@@ -10,7 +11,7 @@ namespace mg
 	class action
 	{
 	public:
-		using action_type		 = std::variant<operator_action, function>;
+		using action_type		 = std::variant<operator_action, function, unary_operation>;
 		using forward_value_type = std::variant<number, independent_variable>;
 		action(const action_type &act)
 			: m_action(act)

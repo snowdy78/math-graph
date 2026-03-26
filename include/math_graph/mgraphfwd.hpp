@@ -11,6 +11,7 @@ namespace mg
 	class number;
 	class variable;
 	class operation;
+	class unexpressed_function;
 	class function;
 	class operator_action;
 	class action;
