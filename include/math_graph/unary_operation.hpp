@@ -33,8 +33,8 @@ namespace mg
 
 	private:
 		constexpr static const char *s_pattern
-			= R"(^[+-]?\s*((?:\d+.?\d*)|\d*(?:\d*.\d+))|([a-zA-Z0-9_]+\s*\([^()]\))|([a-zA-Z0-9_]+)$)";
-		constexpr static const char *s_operator_pattern = R"(^([-])|([+]))";
+			= R"(^\s*[+-]?\s*((?:\d+.?\d*)|\d*(?:\d*.\d+))|([a-zA-Z0-9_]+\s*\([^()]+\))|([a-zA-Z0-9_]+)\s*$)";
+		constexpr static const char *s_operator_pattern = R"(^\s*([-])|([+]))";
 		operation_pointer m_op;
 		forward_type m_operand;
 	};

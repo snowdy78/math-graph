@@ -6,4 +6,5 @@
 #include "./number.hpp"
 #include "./operation.hpp"
 #include "./operator_action.hpp"
+#include "./unary_operation.hpp"
 #include "./tools.hpp"

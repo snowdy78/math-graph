@@ -1,7 +1,6 @@
 #include <iostream>
 #include <variant>
 #include "math_graph/action.hpp"
-#include "math_graph/expression.hpp"
 #include "math_graph/operation.hpp"
 #include "math_graph/tools.hpp"
 

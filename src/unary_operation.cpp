@@ -1,5 +1,4 @@
 #include "math_graph/unary_operation.hpp"
-#include "math_graph/operator_action.hpp"
 #include "math_graph/unexpressed_function.hpp"
 
 namespace mg
@@ -10,17 +9,17 @@ namespace mg
 		std::smatch match;
 		if (!std::regex_search(str, match, rgx))
 		{
-			throw std::runtime_error("unable to create expression by '" + str + "'");
+			throw std::runtime_error("unable to unary operation by '" + str + "' (unable to parse operand)");
 		}
 		if (!match[1].str().empty()) // number
 		{
 			return number(match[1].str());
 		}
-		if (!match[2].str().empty()) // variable
+		if (!match[2].str().empty()) // function
 		{
-			return independent_variable(match[2].str());
+			return mg::unexpressed_function(match[2].str());
 		}
-		return mg::unexpressed_function(match[3].str());
+		return independent_variable(match[3].str());
 	}
 	unary_operation::operation_pointer unary_operation::parse_operator(const string_type &str)
 	{
@@ -28,9 +27,9 @@ namespace mg
 		std::smatch match;
 		if (!std::regex_search(str, match, rgx))
 		{
-			throw std::runtime_error("unable to create expression by '" + str + "'");
+			throw std::runtime_error("unable to create unary operation by '" + str + "' (unable to parse operator)");
 		}
-		if (match[1].str().empty()) // first group is minus
+		if (!match[1].str().empty()) // first group is minus
 		{
 			return &unique_operations::minus;
 		}

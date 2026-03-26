@@ -40,12 +40,15 @@ namespace mg
 
 	bool operation::operator==(const operation &other) const
 	{
-		return &m_name == &other.m_name || m_name == other.m_name;
+		return this == &other;
 	}
 	const operation &operation::get_by_name(const key_type &key)
 	{
 		auto op				 = parse(key);
 		compute_map_type map = get_compute_map();
+		// except unary operations
+		map.erase(&unique_operations::plus);
+		map.erase(&unique_operations::minus);
 		return *std::find_if(map.begin(), map.end(), [&op](const auto &pair) {
 					return pair.first->get() == op;
 				})->first;
