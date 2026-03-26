@@ -44,7 +44,7 @@ namespace mg
 				}
 				nums[i] = std::get<number>(res);
 			}
-			return operation::get_compute_map()[&opact.op()](nums[0], nums[1]);
+			return operation::get_compute_map().at(&opact.op())(nums[0], nums[1]);
 		}
 		throw std::runtime_error("too much arguments for action resolving");
 	}

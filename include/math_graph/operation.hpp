@@ -37,7 +37,7 @@ namespace mg
 		{
 			return m_name;
 		}
-		static compute_map_type get_compute_map();
+		static const compute_map_type &get_compute_map();
 		static const operation &get_by_name(const key_type &);
 		bool operator==(const operation &other) const;
 

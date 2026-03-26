@@ -2,10 +2,10 @@
 #include <cmath>
 namespace mg
 {
-	operation::compute_map_type operation::get_compute_map()
+	const operation::compute_map_type &operation::get_compute_map()
 	{
-		using arg_type		 = const number &;
-		compute_map_type map = {
+		using arg_type				= const number &;
+		static compute_map_type map = {
 			{ &unique_operations::add,
 			  [](arg_type a, arg_type b) {
 				  return a + b;
@@ -25,7 +25,7 @@ namespace mg
 			{ &unique_operations::pow,
 			  [](arg_type a, arg_type b) {
 				  return std::pow(a, b);
-			  } },
+			  } }
 		};
 		return map;
 	}
