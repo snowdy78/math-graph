@@ -9,21 +9,21 @@ TEST_CASE("unary operation construct", "[test]")
 	{
 		SECTION("construct by variable")
 		{
-			mg::unary_operation op1{ "-x" };
+			mg::unary_operation op1{ "-y" };
 			REQUIRE(op1.operation() == mg::unique_operations::minus);
 			REQUIRE(std::holds_alternative<mg::independent_variable>(op1.operand()));
-			REQUIRE(std::get<mg::independent_variable>(op1.operand()).fullname() == "x");
+			REQUIRE(std::get<mg::independent_variable>(op1.operand()).fullname() == "y");
+			REQUIRE(op1.deps().size() == 1);
+			REQUIRE(op1.deps().contains({ "y" }));
 		}
-		SECTION("construct by function")
+		SECTION("construct without operator")
 		{
-			mg::unary_operation op1{ "+f_a1(x, y)" };
+			mg::unary_operation op1{ "x" };
 			REQUIRE(op1.operation() == mg::unique_operations::plus);
-			REQUIRE(std::holds_alternative<mg::unexpressed_function>(op1.operand()));
-			auto &f = std::get<mg::unexpressed_function>(op1.operand());
-			REQUIRE(f.fullname() == "f_a1");
-			REQUIRE(f.args().size() == 2);
-			REQUIRE(f.args().contains({ "x" }));
-			REQUIRE(f.args().contains({ "y" }));
+			REQUIRE(std::holds_alternative<mg::independent_variable>(op1.operand()));
+			REQUIRE(std::get<mg::independent_variable>(op1.operand()).fullname() == "x");
+			REQUIRE(op1.deps().size() == 1);
+			REQUIRE(op1.deps().contains({ "x" }));
 		}
 		SECTION("construct by number")
 		{
@@ -31,6 +31,7 @@ TEST_CASE("unary operation construct", "[test]")
 			REQUIRE(op1.operation() == mg::unique_operations::minus);
 			REQUIRE(std::holds_alternative<mg::number>(op1.operand()));
 			REQUIRE(std::get<mg::number>(op1.operand()) == 2);
+			REQUIRE(op1.deps().empty());
 		}
 		REQUIRE_NOTHROW(mg::unary_operation{ "- x" });
 		REQUIRE_NOTHROW(mg::unary_operation{ "  -  x   " });
@@ -44,6 +45,12 @@ TEST_CASE("unary operation construct", "[test]")
 		SECTION("wrong string")
 		{
 			REQUIRE_THROWS(mg::unary_operation{ "a@43$FSA_fas" });
+		}
+		SECTION("no expression")
+		{
+			REQUIRE_THROWS(mg::unary_operation{ "-(x + 2)" });
+			REQUIRE_THROWS(mg::unary_operation{ "-x + 2" });
+			REQUIRE_THROWS(mg::unary_operation{ "-f(x)" });
 		}
 		SECTION("wrong string")
 		{

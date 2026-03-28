@@ -1,7 +1,6 @@
 #pragma once
 
 #include "independent_variable.hpp"
-#include "unexpressed_function.hpp"
 #include "operation.hpp"
 #include <variant>
 
@@ -14,7 +13,7 @@ namespace mg
 	public:
 		using operation_pointer	  = const operation *;
 		using operation_reference = const operation &;
-		using forward_type		  = std::variant<number, independent_variable, unexpressed_function>;
+		using forward_type		  = std::variant<number, independent_variable>;
 		enum Type
 		{
 			Plus,
@@ -22,20 +21,66 @@ namespace mg
 		};
 
 	private:
-		operation_pointer parse_operator(const string_type &str);
-		forward_type parse_operand(const string_type &str);
+		operation_pointer parse_operator(const string_type &str)
+		{
+			std::regex rgx(s_operator_pattern);
+			std::smatch match;
+			if (!std::regex_search(str, match, rgx))
+			{
+				throw std::runtime_error(
+					"unable to create unary operation by '" + str + "' (unable to parse operator)"
+				);
+			}
+			if (!match[1].str().empty()) // first group is minus
+			{
+				return &unique_operations::minus;
+			}
+			return &unique_operations::plus;
+		}
+		forward_type parse_operand(const string_type &str)
+		{
+			std::regex rgx(s_pattern);
+			std::smatch match;
+			if (!std::regex_search(str, match, rgx))
+			{
+				throw std::runtime_error("unable to unary operation by '" + str + "' (unable to parse operand)");
+			}
+			if (!match[1].str().empty()) // number
+			{
+				return number(match[1].str());
+			}
+			auto var = independent_variable(match[2].str());
+			m_deps.insert(var);
+			return var;
+		}
 
 	public:
-		unary_operation(const string_type &str);
-		unary_operation(const Type &op, const forward_type &operand);
-		const operation &operation() const;
-		const forward_type &operand() const;
+		unary_operation(const string_type &str)
+			: m_op(parse_operator(str)),
+			  m_operand(parse_operand(str))
+		{}
+		unary_operation(const Type &op, const forward_type &operand)
+			: m_op(op == Plus ? &unique_operations::plus : &unique_operations::minus),
+			  m_operand(operand)
+		{}
+		const operation &operation() const
+		{
+			return *m_op;
+		}
+		const set_dependencies &deps() const
+		{
+			return m_deps;
+		}
+		const forward_type &operand() const
+		{
+			return m_operand;
+		}
 
 	private:
-		constexpr static const char *s_pattern
-			= R"(^\s*[+-]?\s*((?:\d+.?\d*)|\d*(?:\d*.\d+))|([a-zA-Z0-9_]+\s*\([^()]+\))|([a-zA-Z0-9_]+)\s*$)";
-		constexpr static const char *s_operator_pattern = R"(^\s*([-])|([+]))";
+		constexpr static const char *s_pattern = R"(^\s*[+-]?\s*((?:\d+.?\d*)|\d*(?:\d*.\d+))|([a-zA-Z0-9_]+)\s*$)";
+		constexpr static const char *s_operator_pattern = R"(^\s*([-])|([+]?))";
 		operation_pointer m_op;
+		set_dependencies m_deps;
 		forward_type m_operand;
 	};
 } // namespace mg

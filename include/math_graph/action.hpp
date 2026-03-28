@@ -24,6 +24,14 @@ namespace mg
 		{
 			return std::holds_alternative<function>(m_action);
 		}
+		bool is_unary_operation() const
+		{
+			return std::holds_alternative<unary_operation>(m_action);
+		}
+		const unary_operation &as_unary_operation() const
+		{
+			return std::get<unary_operation>(m_action);
+		}
 		const operator_action &as_operation() const
 		{
 			return std::get<operator_action>(m_action);
@@ -41,6 +49,10 @@ namespace mg
 			if (is_operator_action())
 			{
 				return std::get<operator_action>(m_action).deps();
+			}
+			if (is_unary_operation())
+			{
+				return as_unary_operation().deps();
 			}
 			throw std::runtime_error("unknown action type");
 		}
