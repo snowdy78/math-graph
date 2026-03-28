@@ -13,8 +13,8 @@ TEST_CASE("function construct", "[test]")
 								  return std::sqrt(args.at({ "x" }));
 							  } };
 			REQUIRE(sqrt.fullname() == "f_1");
-			REQUIRE(sqrt.args().size() == 1);
-			REQUIRE(sqrt.args().contains({ "x" }));
+			REQUIRE(sqrt.deps().size() == 1);
+			REQUIRE(sqrt.deps().contains({ "x" }));
 		}
 		SECTION("multiple args")
 		{
@@ -22,9 +22,9 @@ TEST_CASE("function construct", "[test]")
 								 return std::pow(args.at({ "x1" }), args.at({ "x2" }));
 							 } };
 			REQUIRE(pow.fullname() == "f_a1");
-			REQUIRE(pow.args().size() == 2);
-			REQUIRE(pow.args().contains({ "x1" }));
-			REQUIRE(pow.args().contains({ "x2" }));
+			REQUIRE(pow.deps().size() == 2);
+			REQUIRE(pow.deps().contains({ "x1" }));
+			REQUIRE(pow.deps().contains({ "x2" }));
 		}
 		SECTION("incorrect name")
 		{

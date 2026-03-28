@@ -1,12 +1,12 @@
 #pragma once
 
-#include "independent_variable.hpp"
+#include "dependent.hpp"
 #include "operation.hpp"
 #include <variant>
 
 namespace mg
 {
-	class unary_operation
+	class unary_operation : public dependent
 	{
 
 
@@ -50,7 +50,7 @@ namespace mg
 				return number(match[1].str());
 			}
 			auto var = independent_variable(match[2].str());
-			m_deps.insert(var);
+			dependencies.insert(var);
 			return var;
 		}
 
@@ -67,10 +67,6 @@ namespace mg
 		{
 			return *m_op;
 		}
-		const set_dependencies &deps() const
-		{
-			return m_deps;
-		}
 		const forward_type &operand() const
 		{
 			return m_operand;
@@ -80,7 +76,6 @@ namespace mg
 		constexpr static const char *s_pattern = R"(^\s*[+-]?\s*((?:\d+.?\d*)|\d*(?:\d*.\d+))|([a-zA-Z0-9_]+)\s*$)";
 		constexpr static const char *s_operator_pattern = R"(^\s*([-])|([+]?))";
 		operation_pointer m_op;
-		set_dependencies m_deps;
 		forward_type m_operand;
 	};
 } // namespace mg

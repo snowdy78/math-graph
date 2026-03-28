@@ -30,19 +30,19 @@ namespace mg
 			: unexpressed_function(other),
 			  m_func(f)
 		{}
-		return_type operator()(const map_dependencies &_args) const
+		return_type operator()(const map_dependencies &args) const
 		{
-			if (std::any_of(_args.begin(), _args.end(), [&](const auto &arg) {
-					return !args().contains(arg.first);
+			if (std::any_of(args.begin(), args.end(), [&](const auto &arg) {
+					return !deps().contains(arg.first);
 				}))
 			{
 				throw std::runtime_error("unknown argument in function '" + fullname() + "'");
 			}
-			if (_args.size() > args().size())
+			if (args.size() > deps().size())
 			{
 				throw std::runtime_error("too many arguments in function '" + fullname() + "'");
 			}
-			return m_func(_args);
+			return m_func(args);
 		}
 		const function_type &func() const
 		{

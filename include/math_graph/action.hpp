@@ -1,6 +1,5 @@
 #pragma once
 
-#include "independent_variable.hpp"
 #include "operator_action.hpp"
 #include "unary_operation.hpp"
 #include "function.hpp"
@@ -44,7 +43,7 @@ namespace mg
 		{
 			if (is_function())
 			{
-				return std::get<function>(m_action).args();
+				return std::get<function>(m_action).deps();
 			}
 			if (is_operator_action())
 			{

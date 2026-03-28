@@ -1,3 +1,4 @@
+#include "math_graph/independent_variable.hpp"
 #include "math_graph/tools.hpp"
 #include "math_graph/action.hpp"
 
@@ -14,16 +15,10 @@ namespace mg
 		string_type words[]
 			= { match[2].str().empty() ? match[3] : match[2], match[4], match[6].str().empty() ? match[7] : match[6] };
 		m_left = create_parameter_data(words[0]);
-		if (std::holds_alternative<independent_variable>(*m_left))
-		{
-			m_deps.insert(std::get<independent_variable>(*m_left));
-		}
+		find_and_insert_deps(m_left);
 		m_op	= &operation::get_by_name(words[1][0]);
 		m_right = create_parameter_data(words[2]);
-		if (std::holds_alternative<independent_variable>(*m_right))
-		{
-			m_deps.insert(std::get<independent_variable>(*m_right));
-		}
+		find_and_insert_deps(m_right);
 	}
 	void operator_action::find_and_insert_deps(const std::optional<forward_type> &operand)
 	{
@@ -33,7 +28,7 @@ namespace mg
 		}
 		if (std::holds_alternative<variable_type>(*operand))
 		{
-			m_deps.insert(std::get<variable_type>(*operand));
+			dependencies.insert(std::get<variable_type>(*operand));
 		}
 		else if (std::holds_alternative<pointer_type>(*operand))
 		{
@@ -43,7 +38,7 @@ namespace mg
 				throw std::runtime_error("unable to update dependencies of action by null pointer");
 			}
 			auto &other_deps = other_action->deps();
-			m_deps.insert(other_deps.begin(), other_deps.end());
+			dependencies.insert(other_deps.begin(), other_deps.end());
 		}
 	}
 	bool operator_action::has_nullptr(const forward_type &operand) const
@@ -69,10 +64,6 @@ namespace mg
 	const operator_action::forward_type &operator_action::left() const
 	{
 		return *m_left;
-	}
-	const set_dependencies &operator_action::deps() const
-	{
-		return m_deps;
 	}
 	const operator_action::forward_type &operator_action::right() const
 	{

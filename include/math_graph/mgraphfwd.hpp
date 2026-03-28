@@ -9,6 +9,8 @@ namespace mg
 	using sstream_type = std::basic_stringstream<char_type>;
 	using cstring_type = const char_type *;
 	class number;
+	class independent_variable;
+	class dependent;
 	class variable;
 	class operation;
 	class unexpressed_function;

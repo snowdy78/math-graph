@@ -1,13 +1,13 @@
 #pragma once
 
 #include "operation.hpp"
-#include "independent_variable.hpp"
+#include "dependent.hpp"
 #include <optional>
 #include <variant>
 
 namespace mg
 {
-	class operator_action
+	class operator_action : public dependent
 	{
 	public:
 		using number_type	= number;
@@ -25,7 +25,6 @@ namespace mg
 		operator_action(const forward_type &opleft, const operation &op, const forward_type &opright);
 		operator_action(const string_type &action_str);
 		const forward_type &left() const;
-		const set_dependencies &deps() const;
 		const forward_type &right() const;
 		const operation &op() const;
 
@@ -33,7 +32,6 @@ namespace mg
 		constexpr static const char *s_operator_action_pattern
 			= R"(^(\(([+-]?[a-zA-Z0-9_.]+)\)|([+-]?[a-zA-Z0-9_.]+))\s*(\S)\s*(\(([+-]?[a-zA-Z0-9_.]+)\)|([a-zA-Z0-9_.]+))$)";
 
-		set_dependencies m_deps;
 		std::optional<forward_type> m_left, m_right;
 		const operation *m_op = nullptr;
 	};

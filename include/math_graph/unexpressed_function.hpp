@@ -1,14 +1,14 @@
 #pragma once
 
 #include "mgraphfwd.hpp"
-#include "independent_variable.hpp"
+#include "dependent.hpp"
 #include <initializer_list>
 #include <regex>
 #include <functional>
 
 namespace mg
 {
-	class unexpressed_function : public independent_variable
+	class unexpressed_function : public independent_variable, public dependent
 	{
 	public:
 		using return_type = number;
@@ -23,15 +23,11 @@ namespace mg
 		}
 		unexpressed_function(const string_type &name, set_dependencies &&args)
 			: independent_variable(name),
-			  m_args(std::move(args))
+			  dependent(std::move(args))
 		{}
 		size_t arg_count() const
 		{
-			return m_args.size();
-		}
-		const set_dependencies &args() const
-		{
-			return m_args;
+			return dependencies.size();
 		}
 
 		bool operator==(const unexpressed_function &other) const
@@ -64,15 +60,15 @@ namespace mg
 			std::sregex_iterator reg_end;
 			for (; it != reg_end; ++it)
 			{
-				if (m_args.contains({ it->str() }))
+				if (dependencies.contains({ it->str() }))
 				{
 					throw std::runtime_error("Duplicate argument '" + it->str() + "'");
 				}
-				if (m_args.contains(fullname()))
+				if (dependencies.contains(fullname()))
 				{
 					throw std::runtime_error("Function name '" + fullname() + "' is an argument");
 				}
-				m_args.insert({ it->str() });
+				dependencies.insert({ it->str() });
 			}
 		}
 
@@ -80,8 +76,6 @@ namespace mg
 		constexpr static const char *s_syntax_pattern
 			= R"(^\s*([a-zA-Z0-9_]+)\s*\((\s*[a-zA-Z0-9_]+(?:\s*,\s*[a-zA-Z0-9_]+)*\s*)\)\s*$)";
 		constexpr static const char *s_search_arg_pattern = R"([a-zA-Z0-9_]+)";
-
-		set_dependencies m_args; // function arguments
 	};
 	struct unexpressed_function_hasher : std::hash<std::string>
 	{
