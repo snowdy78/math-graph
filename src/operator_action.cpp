@@ -28,7 +28,7 @@ namespace mg
 		}
 		if (std::holds_alternative<variable_type>(*operand))
 		{
-			var_dependencies.insert(std::get<variable_type>(*operand));
+			dependencies.insert(std::get<variable_type>(*operand));
 		}
 		else if (std::holds_alternative<pointer_type>(*operand))
 		{
@@ -38,7 +38,7 @@ namespace mg
 				throw std::runtime_error("unable to update var dependencies of action by null pointer");
 			}
 			auto &other_deps = other_action->deps();
-			var_dependencies.insert(other_deps.begin(), other_deps.end());
+			dependencies.insert(other_deps.begin(), other_deps.end());
 		}
 	}
 	bool operator_action::has_nullptr(const forward_type &operand) const

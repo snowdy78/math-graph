@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dependent.hpp"
 #include "operator_action.hpp"
 #include "unary_operation.hpp"
 #include "function.hpp"
@@ -12,6 +13,8 @@ namespace mg
 	public:
 		using action_type		 = std::variant<operator_action, function, unary_operation>;
 		using forward_value_type = std::variant<number, independent_variable>;
+		using set_type			 = var_dependent::set_type;
+		using map_type			 = var_dependent::map_type;
 		action(const action_type &act)
 			: m_action(act)
 		{}
@@ -39,7 +42,7 @@ namespace mg
 		{
 			return std::get<function>(m_action);
 		}
-		const set_dependencies &deps() const
+		const set_type &deps() const
 		{
 			if (is_function())
 			{

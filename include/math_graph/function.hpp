@@ -11,14 +11,13 @@ namespace mg
 	{
 	public:
 		using return_type	= number;
-		using params_type	= map_dependencies;
-		using function_type = std::function<return_type(const params_type &)>;
+		using function_type = std::function<return_type(const map_type &)>;
 
 		function(const string_type &decl_str, const function_type &f)
 			: unexpressed_function(decl_str),
 			  m_func(f)
 		{}
-		function(const string_type &name, set_dependencies &&args, const function_type &f)
+		function(const string_type &name, set_type &&args, const function_type &f)
 			: unexpressed_function(name, std::move(args)),
 			  m_func(f)
 		{}
@@ -30,17 +29,11 @@ namespace mg
 			: unexpressed_function(other),
 			  m_func(f)
 		{}
-		return_type operator()(const map_dependencies &args) const
+		return_type operator()(const map_type &args) const
 		{
-			if (std::any_of(args.begin(), args.end(), [&](const auto &arg) {
-					return !deps().contains(arg.first);
-				}))
+			if (!compare(args))
 			{
-				throw std::runtime_error("unknown argument in function '" + fullname() + "'");
-			}
-			if (args.size() > deps().size())
-			{
-				throw std::runtime_error("too many arguments in function '" + fullname() + "'");
+				throw std::runtime_error("failed to call function with given arguments");
 			}
 			return m_func(args);
 		}

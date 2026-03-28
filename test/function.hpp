@@ -9,7 +9,7 @@ TEST_CASE("function construct", "[test]")
 	{
 		SECTION("correct name and args")
 		{
-			mg::function sqrt{ "f1(x)", [](const mg::map_dependencies &args) -> mg::function::return_type {
+			mg::function sqrt{ "f1(x)", [](const auto &args) -> mg::function::return_type {
 								  return std::sqrt(args.at({ "x" }));
 							  } };
 			REQUIRE(sqrt.fullname() == "f_1");
@@ -18,7 +18,7 @@ TEST_CASE("function construct", "[test]")
 		}
 		SECTION("multiple args")
 		{
-			mg::function pow{ "f_a1(x1, x2)", [](const mg::map_dependencies &args) -> mg::function::return_type {
+			mg::function pow{ "f_a1(x1, x2)", [](const auto &args) -> mg::function::return_type {
 								 return std::pow(args.at({ "x1" }), args.at({ "x2" }));
 							 } };
 			REQUIRE(pow.fullname() == "f_a1");
@@ -28,65 +28,57 @@ TEST_CASE("function construct", "[test]")
 		}
 		SECTION("incorrect name")
 		{
-			REQUIRE_THROWS(mg::function{ "_f1(x)", [](const mg::map_dependencies &args) -> mg::function::return_type {
+			REQUIRE_THROWS(mg::function{ "_f1(x)", [](const auto &args) -> mg::function::return_type {
 											return std::sqrt(args.at({ "x" }));
 										} });
 
-			REQUIRE_THROWS(mg::function{ "f1_1(x, x_b, x_c, y)",
-										 [](const mg::map_dependencies &args) -> mg::function::return_type {
-											 return std::sqrt(args.at({ "x" }));
-										 } });
-			REQUIRE_THROWS(mg::function{ "fa(x, x_b, x_c, y)",
-										 [](const mg::map_dependencies &args) -> mg::function::return_type {
-											 return std::sqrt(args.at({ "x" }));
-										 } });
+			REQUIRE_THROWS(mg::function{ "f1_1(x, x_b, x_c, y)", [](const auto &args) -> mg::function::return_type {
+											return std::sqrt(args.at({ "x" }));
+										} });
+			REQUIRE_THROWS(mg::function{ "fa(x, x_b, x_c, y)", [](const auto &args) -> mg::function::return_type {
+											return std::sqrt(args.at({ "x" }));
+										} });
 		}
 		SECTION("incorrect args")
 		{
 			SECTION("no args")
 			{
-				REQUIRE_THROWS(mg::function{ "f1()", [](const mg::map_dependencies &args) -> mg::function::return_type {
+				REQUIRE_THROWS(mg::function{ "f1()", [](const auto &args) -> mg::function::return_type {
 												return std::sqrt(args.at({ "x" }));
 											} });
 			}
 			SECTION("wrong args")
 			{
-				REQUIRE_THROWS(mg::function{ "f1(124121)",
-											 [](const mg::map_dependencies &args) -> mg::function::return_type {
-												 return std::sqrt(args.at({ "x" }));
-											 } });
+				REQUIRE_THROWS(mg::function{ "f1(124121)", [](const auto &args) -> mg::function::return_type {
+												return std::sqrt(args.at({ "x" }));
+											} });
 			}
 			SECTION("same args")
 			{
-				REQUIRE_THROWS(mg::function{ "f1(x, x)",
-											 [](const mg::map_dependencies &args) -> mg::function::return_type {
-												 return std::sqrt(args.at({ "x" }));
-											 } });
+				REQUIRE_THROWS(mg::function{ "f1(x, x)", [](const auto &args) -> mg::function::return_type {
+												return std::sqrt(args.at({ "x" }));
+											} });
 			}
 			SECTION("comma without argument")
 			{
 
-				REQUIRE_THROWS(mg::function{ "f1(x, x, )",
-											 [](const mg::map_dependencies &args) -> mg::function::return_type {
-												 return std::sqrt(args.at({ "x" }));
-											 } });
+				REQUIRE_THROWS(mg::function{ "f1(x, x, )", [](const auto &args) -> mg::function::return_type {
+												return std::sqrt(args.at({ "x" }));
+											} });
 
-				REQUIRE_THROWS(mg::function{ "f1(, x, x)",
-											 [](const mg::map_dependencies &args) -> mg::function::return_type {
-												 return std::sqrt(args.at({ "x" }));
-											 } });
+				REQUIRE_THROWS(mg::function{ "f1(, x, x)", [](const auto &args) -> mg::function::return_type {
+												return std::sqrt(args.at({ "x" }));
+											} });
 			}
 			SECTION("argument without comma")
 			{
-				REQUIRE_THROWS(mg::function{ "f1(a    c ,b)",
-											 [](const mg::map_dependencies &args) -> mg::function::return_type {
-												 return std::sqrt(args.at({ "x" }));
-											 } });
+				REQUIRE_THROWS(mg::function{ "f1(a    c ,b)", [](const auto &args) -> mg::function::return_type {
+												return std::sqrt(args.at({ "x" }));
+											} });
 
-				REQUIRE_THROWS(mg::function{ "f1(,,,)",
-											 [](const mg::map_dependencies &args) -> mg::function::return_type {
-												 return std::sqrt(args.at({ "x" }));
-											 } });
+				REQUIRE_THROWS(mg::function{ "f1(,,,)", [](const auto &args) -> mg::function::return_type {
+												return std::sqrt(args.at({ "x" }));
+											} });
 			}
 		}
 	}
@@ -95,7 +87,7 @@ TEST_CASE("function call", "[test]")
 {
 	SECTION("correct args")
 	{
-		mg::function sqrt{ "f(x)", [](const mg::map_dependencies &args) -> mg::function::return_type {
+		mg::function sqrt{ "f(x)", [](const auto &args) -> mg::function::return_type {
 							  return std::sqrt(args.at({ "x" }));
 						  } };
 		REQUIRE(
@@ -107,7 +99,7 @@ TEST_CASE("function call", "[test]")
 	}
 	SECTION("multiple arguments")
 	{
-		mg::function pow{ "f(x, n)", [](const mg::map_dependencies &args) -> mg::function::return_type {
+		mg::function pow{ "f(x, n)", [](const auto &args) -> mg::function::return_type {
 							 return std::pow(args.at({ "x" }), args.at({ "n" }));
 						 } };
 		REQUIRE(
@@ -120,7 +112,7 @@ TEST_CASE("function call", "[test]")
 	}
 	SECTION("not all args was provided")
 	{
-		mg::function pow{ "f(x, n)", [](const mg::map_dependencies &args) -> mg::function::return_type {
+		mg::function pow{ "f(x, n)", [](const auto &args) -> mg::function::return_type {
 							 return std::pow(args.at({ "x" }), args.at({ "n" }));
 						 } };
 		REQUIRE_THROWS(pow({
@@ -129,7 +121,7 @@ TEST_CASE("function call", "[test]")
 	}
 	SECTION("too much args was given")
 	{
-		mg::function pow{ "f(x, n)", [](const mg::map_dependencies &args) -> mg::function::return_type {
+		mg::function pow{ "f(x, n)", [](const auto &args) -> mg::function::return_type {
 							 return std::pow(args.at({ "x" }), args.at({ "n" }));
 						 } };
 		REQUIRE_THROWS(pow({

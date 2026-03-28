@@ -6,7 +6,7 @@
 
 namespace mg
 {
-	class unary_operation : public dependent
+	class unary_operation : public var_dependent
 	{
 
 
@@ -50,7 +50,7 @@ namespace mg
 				return number(match[1].str());
 			}
 			auto var = independent_variable(match[2].str());
-			var_dependencies.insert(var);
+			dependencies.insert(var);
 			return var;
 		}
 

@@ -4,7 +4,7 @@
 
 namespace mg
 {
-	std::variant<action, number> get_result(const action &act, const map_dependencies &values)
+	std::variant<action, number> get_result(const action &act, const var_dependent::map_type &values)
 	{
 		auto deps = act.deps();
 		if (deps.size() > values.size())

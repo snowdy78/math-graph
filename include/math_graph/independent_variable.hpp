@@ -69,14 +69,4 @@ namespace mg
 
 		string_type m_name;
 	};
-
-	struct variable_hasher
-	{
-		std::size_t operator()(const independent_variable &v) const
-		{
-			return std::hash<std::string>{}(v.fullname());
-		}
-	};
-	using set_dependencies = std::unordered_set<independent_variable, variable_hasher>;
-	using map_dependencies = std::unordered_map<independent_variable, number, variable_hasher>;
 } // namespace mg

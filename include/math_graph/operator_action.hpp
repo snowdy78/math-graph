@@ -7,7 +7,7 @@
 
 namespace mg
 {
-	class operator_action : public dependent
+	class operator_action : public var_dependent
 	{
 	public:
 		using number_type	= number;
