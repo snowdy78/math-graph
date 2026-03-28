@@ -24,21 +24,21 @@ namespace mg
 	{
 		if (!operand.has_value())
 		{
-			throw std::runtime_error("unable to update dependencies of action by given null");
+			throw std::runtime_error("unable to update var dependencies of action by given null");
 		}
 		if (std::holds_alternative<variable_type>(*operand))
 		{
-			dependencies.insert(std::get<variable_type>(*operand));
+			var_dependencies.insert(std::get<variable_type>(*operand));
 		}
 		else if (std::holds_alternative<pointer_type>(*operand))
 		{
 			auto &other_action = std::get<pointer_type>(*operand);
 			if (!other_action)
 			{
-				throw std::runtime_error("unable to update dependencies of action by null pointer");
+				throw std::runtime_error("unable to update var dependencies of action by null pointer");
 			}
 			auto &other_deps = other_action->deps();
-			dependencies.insert(other_deps.begin(), other_deps.end());
+			var_dependencies.insert(other_deps.begin(), other_deps.end());
 		}
 	}
 	bool operator_action::has_nullptr(const forward_type &operand) const

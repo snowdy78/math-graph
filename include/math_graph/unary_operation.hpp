@@ -50,7 +50,7 @@ namespace mg
 				return number(match[1].str());
 			}
 			auto var = independent_variable(match[2].str());
-			dependencies.insert(var);
+			var_dependencies.insert(var);
 			return var;
 		}
 

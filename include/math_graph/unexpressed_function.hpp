@@ -27,7 +27,7 @@ namespace mg
 		{}
 		size_t arg_count() const
 		{
-			return dependencies.size();
+			return var_dependencies.size();
 		}
 
 		bool operator==(const unexpressed_function &other) const
@@ -60,15 +60,15 @@ namespace mg
 			std::sregex_iterator reg_end;
 			for (; it != reg_end; ++it)
 			{
-				if (dependencies.contains({ it->str() }))
+				if (var_dependencies.contains({ it->str() }))
 				{
 					throw std::runtime_error("Duplicate argument '" + it->str() + "'");
 				}
-				if (dependencies.contains(fullname()))
+				if (var_dependencies.contains(fullname()))
 				{
 					throw std::runtime_error("Function name '" + fullname() + "' is an argument");
 				}
-				dependencies.insert({ it->str() });
+				var_dependencies.insert({ it->str() });
 			}
 		}
 

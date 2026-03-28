@@ -8,18 +8,18 @@ namespace mg
 	{
 		dependent() {}
 		dependent(set_dependencies &&deps)
-			: dependencies(std::move(deps))
+			: var_dependencies(std::move(deps))
 		{}
 		dependent(const set_dependencies &deps)
-			: dependencies(deps)
+			: var_dependencies(deps)
 		{}
 
 		const set_dependencies &deps() const
 		{
-			return dependencies;
+			return var_dependencies;
 		}
 
 	protected:
-		set_dependencies dependencies;
+		set_dependencies var_dependencies;
 	};
 } // namespace mg
