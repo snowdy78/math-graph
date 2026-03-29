@@ -63,6 +63,10 @@ namespace mg
 			: m_op(op == Plus ? &unique_operations::plus : &unique_operations::minus),
 			  m_operand(operand)
 		{}
+		unary_operation(const Type &op, forward_type &&operand)
+			: m_op(op == Plus ? &unique_operations::plus : &unique_operations::minus),
+			  m_operand(std::move(operand))
+		{}
 		const operation &operation() const
 		{
 			return *m_op;
