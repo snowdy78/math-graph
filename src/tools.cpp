@@ -1,10 +1,10 @@
 #include "math_graph/tools.hpp"
 #include "math_graph/action.hpp"
-#include "math_graph/operation.hpp"
 
 namespace mg
 {
-	std::variant<action, number> get_result(const action &act, const var_dependent::map_type &values)
+	std::variant<action, number>
+	get_result(const action &act, const var_dependent::map_type &values, const func_dependent::map_type &func_values)
 	{
 		auto deps = act.deps();
 		if (deps.size() > values.size())
@@ -15,8 +15,9 @@ namespace mg
 		{
 			if (act.is_function())
 			{
-				return act.as_function()(values);
+				return func_values.at(act.as_function())(values);
 			}
+			// TODO unary check operation
 			// operator action otherwise
 			auto &opact									 = act.as_operation();
 			std::vector<number> nums					 = { 0.0, 0.0 };

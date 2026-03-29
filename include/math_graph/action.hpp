@@ -3,7 +3,7 @@
 #include "dependent.hpp"
 #include "operator_action.hpp"
 #include "unary_operation.hpp"
-#include "function.hpp"
+#include "unexpressed_function.hpp"
 #include <variant>
 
 namespace mg
@@ -11,7 +11,12 @@ namespace mg
 	class action
 	{
 	public:
-		using action_type		 = std::variant<operator_action, function, unary_operation>;
+		template<class T>
+		using reference = T &;
+		template<class T>
+		using const_reference	 = const T &;
+		using function_type		 = unexpressed_function;
+		using action_type		 = std::variant<operator_action, function_type, unary_operation>;
 		using forward_value_type = std::variant<number, independent_variable>;
 		using set_type			 = var_dependent::set_type;
 		using map_type			 = var_dependent::map_type;
@@ -24,7 +29,7 @@ namespace mg
 		}
 		bool is_function() const
 		{
-			return std::holds_alternative<function>(m_action);
+			return std::holds_alternative<function_type>(m_action);
 		}
 		bool is_unary_operation() const
 		{
@@ -38,15 +43,15 @@ namespace mg
 		{
 			return std::get<operator_action>(m_action);
 		}
-		const function &as_function() const
+		const function_type &as_function() const
 		{
-			return std::get<function>(m_action);
+			return std::get<function_type>(m_action);
 		}
 		const set_type &deps() const
 		{
 			if (is_function())
 			{
-				return std::get<function>(m_action).deps();
+				return std::get<function_type>(m_action).deps();
 			}
 			if (is_operator_action())
 			{

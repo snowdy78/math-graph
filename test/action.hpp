@@ -16,9 +16,7 @@ TEST_CASE("action construct", "[test]")
 	}
 	SECTION("construct by function")
 	{
-		mg::function op{ "f(x)", [](const auto &x) -> mg::function::return_type {
-							return x.at({ "x" });
-						} };
+		mg::unexpressed_function op{ "f(x)" };
 		mg::action act{ op };
 		REQUIRE(act.is_function() == true);
 		REQUIRE(act.deps().size() == 1);
