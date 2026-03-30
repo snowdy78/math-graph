@@ -4,9 +4,9 @@
 
 namespace mg
 {
-	void operator_action::parse(const string_type &str)
+	void binary_operator_action::parse(const string_type &str)
 	{
-		std::regex op_rgx(s_operator_action_pattern);
+		std::regex op_rgx(s_binary_operator_action_pattern);
 		std::smatch match;
 		if (!std::regex_search(str, match, op_rgx))
 		{
@@ -16,11 +16,11 @@ namespace mg
 			= { match[2].str().empty() ? match[3] : match[2], match[4], match[6].str().empty() ? match[7] : match[6] };
 		m_left = create_parameter_data(words[0]);
 		find_and_insert_deps(m_left);
-		m_op	= &operation::get_by_name(words[1][0]);
+		m_op	= &binary_operation::get_by_name(words[1][0]);
 		m_right = create_parameter_data(words[2]);
 		find_and_insert_deps(m_right);
 	}
-	void operator_action::find_and_insert_deps(const std::optional<forward_type> &operand)
+	void binary_operator_action::find_and_insert_deps(const std::optional<forward_type> &operand)
 	{
 		if (!operand.has_value())
 		{
@@ -41,11 +41,13 @@ namespace mg
 			dependencies.insert(other_deps.begin(), other_deps.end());
 		}
 	}
-	bool operator_action::has_nullptr(const forward_type &operand) const
+	bool binary_operator_action::has_nullptr(const forward_type &operand) const
 	{
 		return std::holds_alternative<pointer_type>(operand) && !std::get<pointer_type>(operand);
 	}
-	operator_action::operator_action(const forward_type &opleft, const operation &op, const forward_type &opright)
+	binary_operator_action::binary_operator_action(
+		const forward_type &opleft, const binary_operation &op, const forward_type &opright
+	)
 		: m_left(opleft),
 		  m_right(opright),
 		  m_op(&op)
@@ -57,19 +59,19 @@ namespace mg
 		find_and_insert_deps(opleft);
 		find_and_insert_deps(opright);
 	}
-	operator_action::operator_action(const string_type &action_str)
+	binary_operator_action::binary_operator_action(const string_type &action_str)
 	{
 		parse(action_str);
 	}
-	const operator_action::forward_type &operator_action::left() const
+	const binary_operator_action::forward_type &binary_operator_action::left() const
 	{
 		return *m_left;
 	}
-	const operator_action::forward_type &operator_action::right() const
+	const binary_operator_action::forward_type &binary_operator_action::right() const
 	{
 		return *m_right;
 	}
-	const operation &operator_action::op() const
+	const binary_operation &binary_operator_action::op() const
 	{
 		return *m_op;
 	}

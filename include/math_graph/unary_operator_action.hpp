@@ -6,19 +6,13 @@
 
 namespace mg
 {
-	class unary_operation : public var_dependent
+	class unary_operator_action : public var_dependent
 	{
-
-
 	public:
-		using operation_pointer	  = const operation *;
-		using operation_reference = const operation &;
-		using forward_type		  = std::variant<number, independent_variable>;
-		enum Type
-		{
-			Plus,
-			Minus
-		};
+		using operation_pointer	  = const unary_operation *;
+		using operation_reference = const unary_operation &;
+		using action_pointer	  = const action *;
+		using forward_type		  = std::variant<number, independent_variable, action_pointer>;
 
 	private:
 		operation_pointer parse_operator(const string_type &str)
@@ -55,19 +49,19 @@ namespace mg
 		}
 
 	public:
-		unary_operation(const string_type &str)
+		unary_operator_action(const string_type &str)
 			: m_op(parse_operator(str)),
 			  m_operand(parse_operand(str))
 		{}
-		unary_operation(const Type &op, const forward_type &operand)
-			: m_op(op == Plus ? &unique_operations::plus : &unique_operations::minus),
+		unary_operator_action(const unary_operation &op, const forward_type &operand)
+			: m_op(&op),
 			  m_operand(operand)
 		{}
-		unary_operation(const Type &op, forward_type &&operand)
-			: m_op(op == Plus ? &unique_operations::plus : &unique_operations::minus),
+		unary_operator_action(const unary_operation &op, forward_type &&operand)
+			: m_op(&op),
 			  m_operand(std::move(operand))
 		{}
-		const operation &operation() const
+		const unary_operation &operation() const
 		{
 			return *m_op;
 		}

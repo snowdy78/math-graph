@@ -8,8 +8,8 @@ int main()
 {
 	mg::number n{ "3.14" };
 	mg::independent_variable x{ "x" };
-	mg::action pa(mg::operator_action{ "2 + x" });
-	mg::operator_action pa2(n, mg::unique_operations::mul, &pa);
+	mg::action pa(mg::binary_operator_action{ "2 + x" });
+	mg::binary_operator_action pa2(n, mg::unique_operations::mul, &pa);
 	auto result = mg::get_result(
 		{
 			pa2

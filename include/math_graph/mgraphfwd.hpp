@@ -14,11 +14,13 @@ namespace mg
 	class independent_variable;
 	class var_dependent;
 	class variable;
-	class operation;
+	template<class CharType, class RetT, class... Args>
+	class basic_operation;
 	class unexpressed_function;
 	class func_dependent;
 	class function;
-	class operator_action;
+	class binary_operator_action;
+	class unary_operator_action;
 	class action;
 	class expression;
 

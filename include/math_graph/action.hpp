@@ -1,8 +1,8 @@
 #pragma once
 
 #include "dependent.hpp"
-#include "operator_action.hpp"
-#include "unary_operation.hpp"
+#include "binary_operator_action.hpp"
+#include "unary_operator_action.hpp"
 #include "unexpressed_function.hpp"
 #include <variant>
 
@@ -16,7 +16,9 @@ namespace mg
 		template<class T>
 		using const_reference	 = const T &;
 		using function_type		 = unexpressed_function;
-		using action_type		 = std::variant<operator_action, function_type, unary_operation>;
+		using unary_op_type		 = unary_operator_action;
+		using binary_op_type	 = binary_operator_action;
+		using action_type		 = std::variant<binary_op_type, function_type, unary_op_type>;
 		using forward_value_type = std::variant<number, independent_variable>;
 		using set_type			 = var_dependent::set_type;
 		using map_type			 = var_dependent::map_type;
@@ -25,7 +27,7 @@ namespace mg
 		{}
 		bool is_operator_action() const
 		{
-			return std::holds_alternative<operator_action>(m_action);
+			return std::holds_alternative<binary_op_type>(m_action);
 		}
 		bool is_function() const
 		{
@@ -33,15 +35,15 @@ namespace mg
 		}
 		bool is_unary_operation() const
 		{
-			return std::holds_alternative<unary_operation>(m_action);
+			return std::holds_alternative<unary_op_type>(m_action);
 		}
-		const unary_operation &as_unary_operation() const
+		const unary_op_type &as_unary_operation() const
 		{
-			return std::get<unary_operation>(m_action);
+			return std::get<unary_op_type>(m_action);
 		}
-		const operator_action &as_operation() const
+		const binary_op_type &as_binary_operation() const
 		{
-			return std::get<operator_action>(m_action);
+			return std::get<binary_op_type>(m_action);
 		}
 		const function_type &as_function() const
 		{
@@ -51,11 +53,11 @@ namespace mg
 		{
 			if (is_function())
 			{
-				return std::get<function_type>(m_action).deps();
+				return as_function().deps();
 			}
 			if (is_operator_action())
 			{
-				return std::get<operator_action>(m_action).deps();
+				return as_binary_operation().deps();
 			}
 			if (is_unary_operation())
 			{

@@ -7,7 +7,7 @@
 
 namespace mg
 {
-	class operator_action : public var_dependent
+	class binary_operator_action : public var_dependent
 	{
 	public:
 		using number_type	= number;
@@ -22,17 +22,17 @@ namespace mg
 		void find_and_insert_deps(const std::optional<forward_type> &operand);
 
 	public:
-		operator_action(const forward_type &opleft, const operation &op, const forward_type &opright);
-		operator_action(const string_type &action_str);
+		binary_operator_action(const forward_type &opleft, const binary_operation &op, const forward_type &opright);
+		binary_operator_action(const string_type &action_str);
 		const forward_type &left() const;
 		const forward_type &right() const;
-		const operation &op() const;
+		const binary_operation &op() const;
 
 	private:
-		constexpr static const char *s_operator_action_pattern
+		constexpr static const char *s_binary_operator_action_pattern
 			= R"(^(\(([+-]?[a-zA-Z0-9_.]+)\)|([+-]?[a-zA-Z0-9_.]+))\s*(\S)\s*(\(([+-]?[a-zA-Z0-9_.]+)\)|([a-zA-Z0-9_.]+))$)";
 
 		std::optional<forward_type> m_left, m_right;
-		const operation *m_op = nullptr;
+		const binary_operation *m_op = nullptr;
 	};
 } // namespace mg
