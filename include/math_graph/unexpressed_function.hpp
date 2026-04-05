@@ -2,7 +2,6 @@
 
 #include "mgraphfwd.hpp"
 #include "dependent.hpp"
-#include <initializer_list>
 #include <regex>
 #include <functional>
 

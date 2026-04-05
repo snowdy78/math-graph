@@ -1,4 +1,3 @@
-#pragma once
 #include <catch2/catch_test_macros.hpp>
 #include "math_graph/operation.hpp"
 #include "math_graph/unary_operator_action.hpp"
@@ -13,8 +12,8 @@ TEST_CASE("unary operation construct", "[test]")
 			REQUIRE(&op1.operation() == &mg::unique_operations::minus);
 			REQUIRE(std::holds_alternative<mg::independent_variable>(op1.operand()));
 			REQUIRE(std::get<mg::independent_variable>(op1.operand()).fullname() == "y");
-			REQUIRE(op1.deps().size() == 1);
-			REQUIRE(op1.deps().contains({ "y" }));
+			REQUIRE(op1.var_deps().size() == 1);
+			REQUIRE(op1.var_deps().contains({ "y" }));
 		}
 		SECTION("construct without operator")
 		{
@@ -22,8 +21,8 @@ TEST_CASE("unary operation construct", "[test]")
 			REQUIRE(&op1.operation() == &mg::unique_operations::plus);
 			REQUIRE(std::holds_alternative<mg::independent_variable>(op1.operand()));
 			REQUIRE(std::get<mg::independent_variable>(op1.operand()).fullname() == "x");
-			REQUIRE(op1.deps().size() == 1);
-			REQUIRE(op1.deps().contains({ "x" }));
+			REQUIRE(op1.var_deps().size() == 1);
+			REQUIRE(op1.var_deps().contains({ "x" }));
 		}
 		SECTION("construct by number")
 		{
@@ -31,7 +30,7 @@ TEST_CASE("unary operation construct", "[test]")
 			REQUIRE(&op1.operation() == &mg::unique_operations::minus);
 			REQUIRE(std::holds_alternative<mg::number>(op1.operand()));
 			REQUIRE(std::get<mg::number>(op1.operand()) == 2);
-			REQUIRE(op1.deps().empty());
+			REQUIRE(op1.var_deps().empty());
 		}
 		REQUIRE_NOTHROW(mg::unary_operator_action{ "- x" });
 		REQUIRE_NOTHROW(mg::unary_operator_action{ "  -  x   " });

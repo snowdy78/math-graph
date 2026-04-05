@@ -19,11 +19,12 @@ namespace mg
 	class unexpressed_function;
 	class func_dependent;
 	class function;
+	class action_base;
 	class binary_operator_action;
 	class unary_operator_action;
+	class call_function_action;
 	class action;
 	class expression;
 
 	using var = variable;
-
 } // namespace mg

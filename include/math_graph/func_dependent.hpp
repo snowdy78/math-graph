@@ -14,7 +14,6 @@ namespace mg
 	struct func_dependent
 		: dependent<unexpressed_function, unexpressed_function::function_type, unexpressed_function_hasher>
 	{
-		using dependent<
-			unexpressed_function, unexpressed_function::function_type, unexpressed_function_hasher>::dependent;
+		using dependent::dependent;
 	};
 } // namespace mg

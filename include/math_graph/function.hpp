@@ -1,8 +1,8 @@
 #pragma once
 
 #include "mgraphfwd.hpp"
-#include "independent_variable.hpp"
 #include "unexpressed_function.hpp"
+#include "number.hpp"
 #include <functional>
 
 namespace mg
@@ -31,7 +31,7 @@ namespace mg
 		{}
 		return_type operator()(const map_type &args) const
 		{
-			if (!compare(args))
+			if (!defined_in(args))
 			{
 				throw std::runtime_error("failed to call function with given arguments");
 			}

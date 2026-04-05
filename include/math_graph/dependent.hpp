@@ -1,7 +1,8 @@
 #pragma once
 
-#include <unordered_map>
 #include "independent_variable.hpp"
+#include <unordered_map>
+#include <unordered_set>
 
 namespace mg
 {
@@ -26,7 +27,7 @@ namespace mg
 		{
 			return dependencies;
 		}
-		bool compare(const map_type &map) const
+		bool defined_in(const map_type &map) const
 		{
 			return std::all_of(
 					   map.begin(), map.end(),

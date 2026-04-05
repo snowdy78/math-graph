@@ -1,10 +1,7 @@
 #pragma once
-#include "./action.hpp"
 #include "./function.hpp"
-#include "./expression.hpp"
 #include "./independent_variable.hpp"
 #include "./number.hpp"
 #include "./operation.hpp"
 #include "./binary_operator_action.hpp"
 #include "./unary_operator_action.hpp"
-#include "./tools.hpp"

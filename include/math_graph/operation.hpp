@@ -47,11 +47,12 @@ namespace mg
 		}
 
 	protected:
-		basic_operation(const key_type &op, const function_type &function)
+		basic_operation(const key_type &op, const size_t &priority, const function_type &function)
 			: m_name(parse(std::string(1, op))[0]),
+			  m_priority(priority),
 			  m_function(function)
 		{
-			operations().emplace(std::make_pair(m_name, this));
+			operations().emplace(m_name, this);
 		}
 		~basic_operation()
 		{
@@ -68,9 +69,13 @@ namespace mg
 		}
 
 	public:
-		constexpr key_type get() const
+		key_type get() const
 		{
 			return m_name[0];
+		}
+		size_t priority() const
+		{
+			return m_priority;
 		}
 		static const value_type &get_by_name(const key_type &op)
 		{
@@ -83,6 +88,7 @@ namespace mg
 
 	private:
 		key_type m_name;
+		size_t m_priority = 0;
 		function_type m_function;
 		friend struct unique_operations;
 	};
@@ -93,25 +99,25 @@ namespace mg
 	using unary_operation  = operation<number(const number &)>;
 	struct unique_operations
 	{
-		inline static const binary_operation add{ '+', [](const number &a, const number &b) -> number {
+		inline static const binary_operation add{ '+', 1, [](const number &a, const number &b) -> number {
 													 return a + b;
 												 } };
-		inline static const binary_operation sub{ '-', [](const number &a, const number &b) -> number {
+		inline static const binary_operation sub{ '-', 1, [](const number &a, const number &b) -> number {
 													 return a - b;
 												 } };
-		inline static const binary_operation mul{ '*', [](const number &a, const number &b) -> number {
+		inline static const binary_operation mul{ '*', 2, [](const number &a, const number &b) -> number {
 													 return a * b;
 												 } };
-		inline static const binary_operation div{ '/', [](const number &a, const number &b) -> number {
+		inline static const binary_operation div{ '/', 2, [](const number &a, const number &b) -> number {
 													 return a / b;
 												 } };
-		inline static const binary_operation pow{ '^', [](const number &a, const number &b) -> number {
+		inline static const binary_operation pow{ '^', 3, [](const number &a, const number &b) -> number {
 													 return std::pow(a, b);
 												 } };
-		inline static const unary_operation plus{ '+', [](const number &a) -> number {
+		inline static const unary_operation plus{ '+', 2, [](const number &a) -> number {
 													 return +a;
 												 } }; // unary plus
-		inline static const unary_operation minus{ '-', [](const number &a) -> number {
+		inline static const unary_operation minus{ '-', 2, [](const number &a) -> number {
 													  return -a;
 												  } }; // unary minus
 		~unique_operations() = delete;

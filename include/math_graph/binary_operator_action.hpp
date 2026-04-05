@@ -1,38 +1,33 @@
 #pragma once
 
 #include "operation.hpp"
-#include "dependent.hpp"
-#include <optional>
-#include <variant>
+#include "action_base.hpp"
 
 namespace mg
 {
-	class binary_operator_action : public var_dependent
+	class binary_operator_action : public action_base
 	{
-	public:
-		using number_type	= number;
-		using variable_type = independent_variable;
-		using pointer_type	= const action *;
-		using forward_type	= std::variant<number_type, variable_type, pointer_type>;
-
-	private:
+		// throws if can't create
+		value_type try_create_value(const string_type &str);
 		void parse(const string_type &str);
-		// returns true, if operand has pointer to this action
-		bool has_nullptr(const forward_type &operand) const;
-		void find_and_insert_deps(const std::optional<forward_type> &operand);
 
 	public:
-		binary_operator_action(const forward_type &opleft, const binary_operation &op, const forward_type &opright);
+		using binary_operation_pointer	 = const binary_operation *;
+		using binary_operation_reference = const binary_operation &;
+		binary_operator_action(const value_type &opleft, binary_operation_reference op, const value_type &opright);
 		binary_operator_action(const string_type &action_str);
-		const forward_type &left() const;
-		const forward_type &right() const;
-		const binary_operation &op() const;
+		const value_type &left() const;
+		const value_type &right() const;
+		binary_operation_reference operation() const;
+		result_type evaluate(const var_map_type &vars, const func_map_type &funcs) const override;
+
+		size_t priority() const override;
 
 	private:
 		constexpr static const char *s_binary_operator_action_pattern
-			= R"(^(\(([+-]?[a-zA-Z0-9_.]+)\)|([+-]?[a-zA-Z0-9_.]+))\s*(\S)\s*(\(([+-]?[a-zA-Z0-9_.]+)\)|([a-zA-Z0-9_.]+))$)";
+			= R"(^(?:(?:\((?:([+-]?(?:\d+\.?\d*|\d*\.\d+))|([a-zA-Z0-9_]+))\))|(?:([+-]?(?:\d+\.?\d*|\d*\.\d+))|([a-zA-Z0-9_]+)))\s*([+\-\*\/\^])\s*(?:(?:\((?:([+-]?(?:\d+\.?\d*|\d*\.\d+))|([a-zA-Z0-9_]+))\))|(?:((?:\d+\.?\d*|\d*\.\d+))|([a-zA-Z0-9_]+)))$)";
 
-		std::optional<forward_type> m_left, m_right;
-		const binary_operation *m_op = nullptr;
+		value_type m_left, m_right;
+		binary_operation_pointer m_op = nullptr;
 	};
 } // namespace mg
