@@ -10,8 +10,8 @@ TEST_CASE("unary operation construct", "[test]")
 		{
 			mg::unary_operator_action op1{ "-y" };
 			REQUIRE(&op1.operation() == &mg::unique_operations::minus);
-			REQUIRE(std::holds_alternative<mg::independent_variable>(op1.operand()));
-			REQUIRE(std::get<mg::independent_variable>(op1.operand()).fullname() == "y");
+			REQUIRE(std::holds_alternative<mg::variable_declaration>(op1.operand()));
+			REQUIRE(std::get<mg::variable_declaration>(op1.operand()).fullname() == "y");
 			REQUIRE(op1.var_deps().size() == 1);
 			REQUIRE(op1.var_deps().contains({ "y" }));
 		}
@@ -19,8 +19,8 @@ TEST_CASE("unary operation construct", "[test]")
 		{
 			mg::unary_operator_action op1{ "x" };
 			REQUIRE(&op1.operation() == &mg::unique_operations::plus);
-			REQUIRE(std::holds_alternative<mg::independent_variable>(op1.operand()));
-			REQUIRE(std::get<mg::independent_variable>(op1.operand()).fullname() == "x");
+			REQUIRE(std::holds_alternative<mg::variable_declaration>(op1.operand()));
+			REQUIRE(std::get<mg::variable_declaration>(op1.operand()).fullname() == "x");
 			REQUIRE(op1.var_deps().size() == 1);
 			REQUIRE(op1.var_deps().contains({ "x" }));
 		}

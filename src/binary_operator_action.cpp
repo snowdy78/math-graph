@@ -1,26 +1,10 @@
 #include "math_graph/binary_operator_action.hpp"
-#include "math_graph/independent_variable.hpp"
+#include <variant>
+#include "math_graph/dependency_values.hpp"
+#include "math_graph/variable_definition.hpp"
 
 namespace mg
 {
-	action_base::value_type binary_operator_action::try_create_value(const string_type &str)
-	{
-		try
-		{
-			return independent_variable(str);
-		}
-		catch (std::runtime_error &e)
-		{
-			try
-			{
-				return number(str);
-			}
-			catch (std::runtime_error &e)
-			{
-				throw std::runtime_error("unable to create value by '" + str + "' for binary operator action");
-			}
-		}
-	}
 	void binary_operator_action::parse(const string_type &str)
 	{
 		std::regex op_rgx(s_binary_operator_action_pattern);
@@ -45,26 +29,33 @@ namespace mg
 		auto rit_v				 = std::find_if(right_vars, right_vars + 2, [](const string_type &s) {
 			  return !s.empty();
 		  });
-		m_left					 = lit_v != left_vars + 2 ? pull_deps(independent_variable(*lit_v)) : number(*lit_n);
+		m_left					 = lit_v != left_vars + 2 ? std::move(variable_definition(*lit_v).copy())
+														  : std::move(number_definition(*lit_n).copy());
 		m_op					 = &binary_operation::get_by_name(match[5].str()[0]);
-		m_right					 = rit_v != right_vars + 2 ? pull_deps(independent_variable(*rit_v)) : number(*rit_n);
+		m_right					 = rit_v != right_vars + 2 ? std::move(variable_definition(*rit_v).copy())
+														   : std::move(number_definition(*rit_n).copy());
 	}
 	binary_operator_action::binary_operator_action(
 		const value_type &opleft, binary_operation_reference op, const value_type &opright
 	)
-		: m_left(pull_deps(opleft)),
-		  m_right(pull_deps(opright)),
+		: m_left(std::move(opleft->copy())),
+		  m_right(std::move(opright->copy())),
 		  m_op(&op)
-	{}
+	{
+		pull_deps(*m_left);
+		pull_deps(*m_right);
+	}
 	binary_operator_action::binary_operator_action(const string_type &action_str)
 	{
 		parse(action_str);
+		pull_deps(*m_left);
+		pull_deps(*m_right);
 	}
-	const binary_operator_action::value_type &binary_operator_action::left() const
+	const binary_operator_action::operand_type &binary_operator_action::left() const
 	{
 		return m_left;
 	}
-	const binary_operator_action::value_type &binary_operator_action::right() const
+	const binary_operator_action::operand_type &binary_operator_action::right() const
 	{
 		return m_right;
 	}
@@ -72,27 +63,18 @@ namespace mg
 	{
 		return *m_op;
 	}
-	action_base::result_type
-	binary_operator_action::evaluate(const var_map_type &vars, const func_map_type &funcs) const
+	action_base::result_type binary_operator_action::evaluate(const dependency_values &values) const
 	{
-		if (!var_dependent::defined_in(vars) || !func_dependent::defined_in(funcs))
+		auto left = m_left->evaluate(values);
+		if (auto left_value = std::get_if<number>(&left))
 		{
-			return this;
-		}
-		std::unordered_map<const value_type *, number> v = {
-			{ &m_left,  0 },
-			{ &m_right, 0 }
-		};
-		for (auto &[value, num]: v)
-		{
-			auto res = find_value(value, vars, funcs);
-			if (std::holds_alternative<action_type>(res))
+			auto right = m_right->evaluate(values);
+			if (auto right_value = std::get_if<number>(&right))
 			{
-				return this;
+				return operation()(*left_value, *right_value);
 			}
-			num = std::get<number>(res);
 		}
-		return operation()(v.at(&m_left), v.at(&m_right));
+		return this;
 	}
 
 	size_t binary_operator_action::priority() const

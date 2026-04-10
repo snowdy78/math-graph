@@ -186,7 +186,7 @@ TEST_CASE("binary_operator_action construct", "[test]")
 			auto test = [](mg::string_type opact_string, mg::string_type var_name) {
 				mg::binary_operator_action op1{ opact_string };
 				mg::action_base &p = op1;
-				mg::independent_variable x{ var_name };
+				mg::variable_declaration x{ var_name };
 				mg::binary_operator_action op{ x, mg::unique_operations::add, &p };
 				REQUIRE(&op.operation() == &mg::unique_operations::add);
 				REQUIRE(std::holds_alternative<mg::binary_operator_action::variable_type>(op.left()));

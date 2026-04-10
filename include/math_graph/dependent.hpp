@@ -1,19 +1,19 @@
 #pragma once
 
-#include "independent_variable.hpp"
+#include "mgraphfwd.hpp"
 #include <unordered_map>
 #include <unordered_set>
+#include <algorithm>
+
 
 namespace mg
 {
-	template<class Kty, class Vty, class Hasher = std::hash<Kty>>
 	struct dependent
 	{
-		using key_type	  = Kty;
-		using value_type  = Vty;
-		using hasher_type = Hasher;
-		using set_type	  = std::unordered_set<key_type, hasher_type>;
-		using map_type	  = std::unordered_map<key_type, value_type, hasher_type>;
+		using key_type	 = string_type;
+		using value_type = const definition *;
+		using set_type	 = std::unordered_set<key_type>;
+		using map_type	 = std::unordered_map<key_type, value_type>;
 
 		dependent() {}
 		dependent(set_type &&deps)
@@ -26,6 +26,11 @@ namespace mg
 		const set_type &deps() const
 		{
 			return dependencies;
+		}
+		virtual void pull_deps(const dependent &def)
+		{
+			auto &deps = def.deps();
+			dependencies.insert(deps.begin(), deps.end());
 		}
 		bool defined_in(const map_type &map) const
 		{
@@ -40,17 +45,5 @@ namespace mg
 
 	protected:
 		set_type dependencies;
-	};
-
-	struct variable_hasher
-	{
-		std::size_t operator()(const independent_variable &v) const
-		{
-			return std::hash<std::string>{}(v.fullname());
-		}
-	};
-	struct var_dependent : dependent<independent_variable, number, variable_hasher>
-	{
-		using dependent<independent_variable, number, variable_hasher>::dependent;
 	};
 } // namespace mg

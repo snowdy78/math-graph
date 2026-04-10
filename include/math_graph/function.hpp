@@ -1,32 +1,32 @@
 #pragma once
 
 #include "mgraphfwd.hpp"
-#include "unexpressed_function.hpp"
+#include "function_declaration.hpp"
 #include "number.hpp"
 #include <functional>
 
 namespace mg
 {
-	class function : public unexpressed_function
+	class function : public function_declaration
 	{
 	public:
 		using return_type	= number;
 		using function_type = std::function<return_type(const map_type &)>;
 
 		function(const string_type &decl_str, const function_type &f)
-			: unexpressed_function(decl_str),
+			: function_declaration(decl_str),
 			  m_func(f)
 		{}
 		function(const string_type &name, set_type &&args, const function_type &f)
-			: unexpressed_function(name, std::move(args)),
+			: function_declaration(name, std::move(args)),
 			  m_func(f)
 		{}
-		function(unexpressed_function &&other, const function_type &f)
-			: unexpressed_function(std::move(other)),
+		function(function_declaration &&other, const function_type &f)
+			: function_declaration(std::move(other)),
 			  m_func(f)
 		{}
-		function(const unexpressed_function &other, const function_type &f)
-			: unexpressed_function(other),
+		function(const function_declaration &other, const function_type &f)
+			: function_declaration(other),
 			  m_func(f)
 		{}
 		return_type operator()(const map_type &args) const
@@ -43,11 +43,11 @@ namespace mg
 		}
 		bool operator==(const function &other) const
 		{
-			return unexpressed_function::operator==(other);
+			return function_declaration::operator==(other);
 		}
 		bool operator<=>(const function &other) const
 		{
-			return unexpressed_function::operator<=>(other);
+			return function_declaration::operator<=>(other);
 		}
 
 	private:

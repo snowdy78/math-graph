@@ -41,7 +41,7 @@ namespace mg
 			{
 				return number(match[1].str());
 			}
-			return pull_deps(independent_variable(match[2].str()));
+			return pull_deps(variable_declaration(match[2].str()));
 		}
 
 	public:
