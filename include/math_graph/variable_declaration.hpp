@@ -61,6 +61,7 @@ namespace mg
 				return 1;
 			return 0;
 		}
+		std::unique_ptr<defined> define(const definition *def) const override;
 
 	private:
 		constexpr static const char *s_pattern = R"(^([a-zA-Z])((\d*)|_([a-zA-Z]*\d*)?)$)";
