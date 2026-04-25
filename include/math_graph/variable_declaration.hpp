@@ -1,14 +1,12 @@
 #pragma once
 
 #include "mgraphfwd.hpp"
-#include "number.hpp"
 #include <regex>
-#include <unordered_map>
-#include <unordered_set>
+#include "declaration.hpp"
 
 namespace mg
 {
-	class independent_variable
+	class variable_declaration : public virtual declaration
 	{
 		string_type parse(const string_type &var_name)
 		{
@@ -24,7 +22,7 @@ namespace mg
 		}
 
 	public:
-		independent_variable(const string_type &name)
+		variable_declaration(const string_type &name)
 		{
 			rename(name);
 		}
@@ -51,11 +49,11 @@ namespace mg
 		{
 			m_name = parse(name);
 		}
-		bool operator==(const independent_variable &other) const
+		bool operator==(const variable_declaration &other) const
 		{
 			return &other == this || fullname() == other.fullname();
 		}
-		bool operator<=>(const independent_variable &other) const
+		bool operator<=>(const variable_declaration &other) const
 		{
 			if (fullname() < other.fullname())
 				return -1;

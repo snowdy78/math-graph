@@ -1,36 +1,44 @@
 #include <catch2/catch_test_macros.hpp>
 #include "math_graph/operation.hpp"
 #include "math_graph/unary_operator_action.hpp"
+#include "math_graph/unpack_variable_action.hpp"
 
 TEST_CASE("unary operation construct", "[test]")
 {
+	using uoperator = mg::unary_operator_action;
+	auto check
+		= []<class... T>(const uoperator &act, const mg::unary_operation &op, size_t dep_count, const T &...dep_names) {
+			  REQUIRE(&act.operation() == &op);
+			  REQUIRE(act.deps().size() == dep_count);
+			  REQUIRE((act.deps().contains(dep_names) && ...));
+		  };
 	SECTION("construct by correct string")
 	{
 		SECTION("construct by variable")
 		{
 			mg::unary_operator_action op1{ "-y" };
-			REQUIRE(&op1.operation() == &mg::unique_operations::minus);
-			REQUIRE(std::holds_alternative<mg::independent_variable>(op1.operand()));
-			REQUIRE(std::get<mg::independent_variable>(op1.operand()).fullname() == "y");
-			REQUIRE(op1.var_deps().size() == 1);
-			REQUIRE(op1.var_deps().contains({ "y" }));
+			check(op1, mg::unique_operations::minus, 1, "y");
+			REQUIRE(op1.operand().is_expression());
+			auto p = dynamic_cast<const mg::unpack_variable_action *>(&op1.operand().as_expression());
+			REQUIRE(p != nullptr);
+			REQUIRE(p->variable().fullname() == "y");
 		}
 		SECTION("construct without operator")
 		{
 			mg::unary_operator_action op1{ "x" };
-			REQUIRE(&op1.operation() == &mg::unique_operations::plus);
-			REQUIRE(std::holds_alternative<mg::independent_variable>(op1.operand()));
-			REQUIRE(std::get<mg::independent_variable>(op1.operand()).fullname() == "x");
-			REQUIRE(op1.var_deps().size() == 1);
-			REQUIRE(op1.var_deps().contains({ "x" }));
+			check(op1, mg::unique_operations::plus, 1, "x");
+			REQUIRE(op1.operand().is_expression());
+			auto p = dynamic_cast<const mg::unpack_variable_action *>(&op1.operand().as_expression());
+			REQUIRE(p != nullptr);
+			REQUIRE(p->variable().fullname() == "x");
 		}
 		SECTION("construct by number")
 		{
 			mg::unary_operator_action op1{ "-2.0" };
-			REQUIRE(&op1.operation() == &mg::unique_operations::minus);
-			REQUIRE(std::holds_alternative<mg::number>(op1.operand()));
-			REQUIRE(std::get<mg::number>(op1.operand()) == 2);
-			REQUIRE(op1.var_deps().empty());
+			check(op1, mg::unique_operations::minus, 0);
+			REQUIRE(op1.operand().is_number());
+			REQUIRE(op1.operand().as_number() == 2);
+			REQUIRE(op1.deps().empty());
 		}
 		REQUIRE_NOTHROW(mg::unary_operator_action{ "- x" });
 		REQUIRE_NOTHROW(mg::unary_operator_action{ "  -  x   " });

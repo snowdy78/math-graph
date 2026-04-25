@@ -1,8 +1,8 @@
 #pragma once
 
-#include <variant>
 #include "operation.hpp"
 #include "action_base.hpp"
+#include "unpack_variable_action.hpp"
 
 namespace mg
 {
@@ -29,7 +29,7 @@ namespace mg
 			}
 			return &unique_operations::plus;
 		}
-		value_type parse_operand(const string_type &str)
+		expression parse_operand(const string_type &str)
 		{
 			std::regex rgx(s_pattern);
 			std::smatch match;
@@ -41,7 +41,9 @@ namespace mg
 			{
 				return number(match[1].str());
 			}
-			return pull_deps(independent_variable(match[2].str()));
+			auto var_name = match[2].str();
+			pull_deps({ { var_name } });
+			return unpack_variable_action(var_name);
 		}
 
 	public:
@@ -49,38 +51,36 @@ namespace mg
 			: m_op(parse_operator(str)),
 			  m_operand(parse_operand(str))
 		{}
-		unary_operator_action(const unary_operation &op, const value_type &operand)
+		unary_operator_action(const unary_operation &op, const expression &operand)
 			: m_op(&op),
-			  m_operand(pull_deps(operand))
+			  m_operand(operand)
 		{}
 		operation_reference operation() const
 		{
 			return *m_op;
 		}
-		const value_type &operand() const
+		const expression &operand() const
 		{
 			return m_operand;
 		}
-		result_type evaluate(const var_map_type &vars, const func_map_type &funcs) const override
+		result_type evaluate(const dependency_map &funcs) const override
 		{
-			if (!var_dependent::defined_in(vars) || !func_dependent::defined_in(funcs))
-			{
-				return this;
-			}
-			auto res = find_value(&m_operand, vars, funcs);
-			if (std::holds_alternative<action_type>(res))
-				return this;
-			return operation()(std::get<number>(res));
+			return m_operand.evaluate(funcs);
 		}
 		size_t priority() const override
 		{
 			return m_op->priority();
 		}
 
+		unique_action copy() const override
+		{
+			return std::make_unique<unary_operator_action>(*this);
+		}
+
 	private:
 		constexpr static const char *s_pattern = R"(^\s*[+-]?\s*((?:\d+.?\d*)|\d*(?:\d*.\d+))|([a-zA-Z0-9_]+)\s*$)";
 		constexpr static const char *s_operator_pattern = R"(^\s*([-])|([+]?))";
 		operation_pointer m_op;
-		value_type m_operand;
+		expression m_operand;
 	};
 } // namespace mg

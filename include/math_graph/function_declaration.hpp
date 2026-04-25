@@ -1,43 +1,44 @@
 #pragma once
 
 #include "mgraphfwd.hpp"
+#include "variable_declaration.hpp"
 #include "dependent.hpp"
-#include <regex>
-#include <functional>
 
 namespace mg
 {
-	class unexpressed_function : public independent_variable, public var_dependent
+	class function_declaration : public variable_declaration, public dependent
 	{
 	public:
-		using return_type	= number;
-		using function_type = std::function<return_type(const map_type &)>;
+		using return_type = number;
+		using args_list	  = std::vector<variable_declaration>;
+		using args_set	  = dependent::set_type;
 
-		unexpressed_function(const string_type &decl_str)
-			: independent_variable("f")
+		function_declaration(const string_type &decl_str)
+			: variable_declaration("f")
 		{
 			parse(decl_str);
 		}
-		unexpressed_function(const string_type &name, set_type &&args)
-			: independent_variable(name),
-			  var_dependent(std::move(args))
-		{}
-		size_t arg_count() const
+		function_declaration(const string_type &name, args_list &&args)
+			: variable_declaration(name),
+			  m_args(std::move(args))
 		{
-			return dependencies.size();
+			for (auto &arg: m_args)
+			{
+				if (!dependencies.insert(arg.fullname()).second)
+					throw std::runtime_error("duplicate argument name");
+			}
 		}
-
-		bool operator==(const unexpressed_function &other) const
-		{
-			return &other == this || fullname() == other.fullname();
-		}
-		bool operator<=>(const unexpressed_function &other) const
+		bool operator<=>(const function_declaration &other) const
 		{
 			if (fullname() > other.fullname())
 				return 1;
 			if (fullname() < other.fullname())
 				return -1;
 			return 0;
+		}
+		const args_list &args() const
+		{
+			return m_args;
 		}
 
 	private:
@@ -55,17 +56,19 @@ namespace mg
 			std::regex args_rgx(s_search_arg_pattern);
 			std::sregex_iterator it(params_str.begin(), params_str.end(), args_rgx);
 			std::sregex_iterator reg_end;
+			std::unordered_set<string_type> args;
 			for (; it != reg_end; ++it)
 			{
-				if (dependencies.contains({ it->str() }))
+				if (args.contains(it->str()))
 				{
 					throw std::runtime_error("Duplicate argument '" + it->str() + "'");
 				}
-				if (dependencies.contains(fullname()))
+				if (variable_declaration(it->str()) == *this)
 				{
 					throw std::runtime_error("Function name '" + fullname() + "' is an argument");
 				}
-				dependencies.insert({ it->str() });
+				args.insert(it->str());
+				m_args.emplace_back(it->str());
 			}
 		}
 
@@ -73,5 +76,6 @@ namespace mg
 		constexpr static const char *s_syntax_pattern
 			= R"(^\s*([a-zA-Z0-9_]+)\s*\((\s*[a-zA-Z0-9_]+(?:\s*,\s*[a-zA-Z0-9_]+)*\s*)\)\s*$)";
 		constexpr static const char *s_search_arg_pattern = R"([a-zA-Z0-9_]+)";
+		args_list m_args;
 	};
 } // namespace mg

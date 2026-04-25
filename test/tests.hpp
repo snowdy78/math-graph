@@ -1,6 +1,7 @@
 #pragma once
-#include "./function.hpp"
-#include "./independent_variable.hpp"
+#include "./function_declaration.hpp"
+#include "./call_function_action.hpp"
+#include "./variable_declaration.hpp"
 #include "./number.hpp"
 #include "./operation.hpp"
 #include "./binary_operator_action.hpp"
