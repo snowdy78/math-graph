@@ -67,8 +67,6 @@ namespace mg
 		  m_right(number(0))
 	{
 		parse(action_str);
-		pull_deps(*m_left);
-		pull_deps(*m_right);
 	}
 	const binary_operator_action::operand_type &binary_operator_action::left() const
 	{
