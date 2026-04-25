@@ -3,6 +3,7 @@
 #include "mgraphfwd.hpp"
 #include <regex>
 #include <stdexcept>
+#include "definition.hpp"
 
 namespace mg
 {
@@ -54,5 +55,18 @@ namespace mg
 			m_value /= other.m_value;
 			return *this;
 		}
+	};
+	struct number_definition : public virtual definition
+	{
+		number_definition(const number &value)
+			: m_value(value)
+		{}
+		std::unique_ptr<definition> copy() const override
+		{
+			return std::make_unique<number_definition>(m_value);
+		}
+
+	private:
+		number m_value;
 	};
 } // namespace mg
