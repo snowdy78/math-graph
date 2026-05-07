@@ -30,7 +30,6 @@ namespace mg
 		number(double n)
 			: m_value(n)
 		{}
-
 		operator double() const
 		{
 			return m_value;

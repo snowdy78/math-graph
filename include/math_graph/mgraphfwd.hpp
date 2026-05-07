@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <sstream>
+#include <unordered_set>
+#include <vector>
 
 namespace mg
 {
@@ -8,23 +10,29 @@ namespace mg
 	using string_type  = std::basic_string<char_type>;
 	using sstream_type = std::basic_stringstream<char_type>;
 	using cstring_type = const char_type *;
-	template<class Kty, class Vty, class Hasher>
-	class dependent;
+	class expression;
+	struct dependent;
+	struct dependency_map;
+	using dependency_set	= std::unordered_set<const expression *>;
+	using dependency_vector = std::vector<const expression *>;
 	class number;
-	class independent_variable;
-	class var_dependent;
 	class variable;
 	template<class CharType, class RetT, class... Args>
 	class basic_operation;
-	class unexpressed_function;
-	class func_dependent;
-	class function;
-	class action_base;
 	class binary_operator_action;
 	class unary_operator_action;
 	class call_function_action;
-	class action;
-	class expression;
-
+	struct declaration;
+	template<class T>
+	struct is_declaration_child
+	{
+		constexpr static bool value = !std::is_abstract_v<T> && std::is_base_of_v<declaration, T>;
+	};
+	template<class T>
+		requires is_declaration_child<T>::value
+	struct definition;
+	struct equation;
+	class variable_declaration;
+	class function_declaration;
 	using var = variable;
 } // namespace mg

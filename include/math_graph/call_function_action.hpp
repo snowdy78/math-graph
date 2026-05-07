@@ -1,61 +1,64 @@
 #pragma once
 
 #include "action_base.hpp"
-#include "unexpressed_function.hpp"
+#include "function_declaration.hpp"
+#include "definition.hpp"
+#include "expression.hpp"
 
 namespace mg
 {
 	class call_function_action : public action_base
 	{
+		using computed_args = std::vector<expression>;
+
 	public:
-		using expression_map_type = std::unordered_map<independent_variable, value_type>;
-		call_function_action(const unexpressed_function &func, const expression_map_type &args)
+		call_function_action(const definition<function_declaration> &func, const dependency_vector &forward_args)
 			: m_func(func)
 		{
-			if (func.arg_count() != args.size())
+			if (func.args().size() != forward_args.size())
 			{
 				throw std::runtime_error("failed to call function with given arguments");
 			}
-			pull_deps(func);
-			for (auto &[key, value]: args)
-			{
-				m_args.insert({ key, pull_deps(value) });
-			}
+			pull_deps(m_func);
+			m_args.assign(forward_args.begin(), forward_args.end());
 		}
-		result_type evaluate(const var_map_type &vars, const func_map_type &funcs) const override
+		result_type evaluate(const dependency_map &values) const override
 		{
-			if (!var_dependent::defined_in(vars) || !func_dependent::defined_in(funcs))
-			{
-				return this;
-			}
-			std::unordered_map<const value_type *, number> forward;
-			for (auto &[key, value]: m_args)
-			{
-				forward.insert({ &value, 0 });
-			}
-			for (auto &[value, num]: forward)
-			{
-				auto res = find_value(value, vars, funcs);
-				if (std::holds_alternative<action_type>(res))
-				{
-					return this;
-				}
-				num = std::get<number>(res);
-			}
-			var_map_type backward;
-			for (auto &[key, value]: m_args)
-			{
-				backward.insert({ key, forward.at(&value) });
-			}
-			return funcs.at(m_func)(backward);
+			auto evaluation = evaluate_arguments(values);
+			auto arg_values = make_dependency_values(evaluation);
+			return m_func.evaluate(arg_values);
 		}
 		size_t priority() const override
 		{
 			return 0;
 		}
+		unique_action copy() const override
+		{
+			return std::make_unique<call_function_action>(*this);
+		}
 
 	private:
-		unexpressed_function m_func;
-		expression_map_type m_args;
+		computed_args evaluate_arguments(const dependency_map &values) const
+		{
+			computed_args eval_args;
+			for (auto &arg: m_args)
+			{
+				eval_args.push_back(arg->evaluate(values));
+			}
+			return eval_args;
+		}
+		dependency_map make_dependency_values(const computed_args &exprs) const
+		{
+			dependency_map arg_values;
+			for (size_t i = 0; i < m_args.size(); ++i)
+			{
+				arg_values.emplace(m_func.args()[i].fullname(), &exprs[i]);
+			}
+			return arg_values;
+		}
+
+	private:
+		definition<function_declaration> m_func;
+		dependency_vector m_args;
 	};
 } // namespace mg

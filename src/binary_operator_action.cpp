@@ -1,26 +1,12 @@
 #include "math_graph/binary_operator_action.hpp"
-#include "math_graph/independent_variable.hpp"
+#include "math_graph/dependency_map.hpp"
+#include "math_graph/unpack_variable_action.hpp"
+#include "math_graph/number.hpp"
+#include "math_graph/equation.hpp"
+#include <optional>
 
 namespace mg
 {
-	action_base::value_type binary_operator_action::try_create_value(const string_type &str)
-	{
-		try
-		{
-			return independent_variable(str);
-		}
-		catch (std::runtime_error &e)
-		{
-			try
-			{
-				return number(str);
-			}
-			catch (std::runtime_error &e)
-			{
-				throw std::runtime_error("unable to create value by '" + str + "' for binary operator action");
-			}
-		}
-	}
 	void binary_operator_action::parse(const string_type &str)
 	{
 		std::regex op_rgx(s_binary_operator_action_pattern);
@@ -33,38 +19,60 @@ namespace mg
 		string_type left_vars[]	 = { match[2], match[4] };
 		string_type right_nums[] = { match[6], match[8] };
 		string_type right_vars[] = { match[7], match[9] };
-		auto lit_n				 = std::find_if(left_nums, left_nums + 2, [](const string_type &s) {
-			  return !s.empty();
-		  });
 		auto lit_v				 = std::find_if(left_vars, left_vars + 2, [](const string_type &s) {
-			  return !s.empty();
-		  });
-		auto rit_n				 = std::find_if(right_nums, right_nums + 2, [](const string_type &s) {
 			  return !s.empty();
 		  });
 		auto rit_v				 = std::find_if(right_vars, right_vars + 2, [](const string_type &s) {
 			  return !s.empty();
 		  });
-		m_left					 = lit_v != left_vars + 2 ? pull_deps(independent_variable(*lit_v)) : number(*lit_n);
 		m_op					 = &binary_operation::get_by_name(match[5].str()[0]);
-		m_right					 = rit_v != right_vars + 2 ? pull_deps(independent_variable(*rit_v)) : number(*rit_n);
+
+		if (lit_v != left_vars + 2)
+		{
+			m_left = unpack_variable_action{ *lit_v };
+			pull_deps(m_left);
+		}
+		else
+		{
+			auto lit_n = std::find_if(left_nums, left_nums + 2, [](const string_type &s) {
+				return !s.empty();
+			});
+			m_left	   = number(*lit_n);
+		}
+		if (rit_v != right_vars + 2)
+		{
+			m_right = unpack_variable_action(*rit_v);
+			pull_deps(m_right);
+		}
+		else
+		{
+			auto rit_n = std::find_if(right_nums, right_nums + 2, [](const string_type &s) {
+				return !s.empty();
+			});
+			m_right	   = number(*rit_n);
+		}
 	}
 	binary_operator_action::binary_operator_action(
-		const value_type &opleft, binary_operation_reference op, const value_type &opright
+		const operand_type &opleft, binary_operation_reference op, const operand_type &opright
 	)
-		: m_left(pull_deps(opleft)),
-		  m_right(pull_deps(opright)),
+		: m_left(opleft),
+		  m_right(opright),
 		  m_op(&op)
-	{}
+	{
+		pull_deps(m_left.deps());
+		pull_deps(m_right.deps());
+	}
 	binary_operator_action::binary_operator_action(const string_type &action_str)
+		: m_left(number(0)),
+		  m_right(number(0))
 	{
 		parse(action_str);
 	}
-	const binary_operator_action::value_type &binary_operator_action::left() const
+	const binary_operator_action::operand_type &binary_operator_action::left() const
 	{
 		return m_left;
 	}
-	const binary_operator_action::value_type &binary_operator_action::right() const
+	const binary_operator_action::operand_type &binary_operator_action::right() const
 	{
 		return m_right;
 	}
@@ -72,27 +80,41 @@ namespace mg
 	{
 		return *m_op;
 	}
-	action_base::result_type
-	binary_operator_action::evaluate(const var_map_type &vars, const func_map_type &funcs) const
+	action_base::result_type binary_operator_action::evaluate(const dependency_map &values) const
 	{
-		if (!var_dependent::defined_in(vars) || !func_dependent::defined_in(funcs))
+		std::optional<equation> left_eq{}, right_eq{};
+		std::optional<result_type> left, right;
+		try
 		{
-			return this;
+			left = m_left.evaluate(values);
 		}
-		std::unordered_map<const value_type *, number> v = {
-			{ &m_left,  0 },
-			{ &m_right, 0 }
-		};
-		for (auto &[value, num]: v)
+		catch (const equation &eq)
 		{
-			auto res = find_value(value, vars, funcs);
-			if (std::holds_alternative<action_type>(res))
+			left_eq = eq;
+		}
+		try
+		{
+			right = m_right.evaluate(values);
+		}
+		catch (const equation &eq)
+		{
+			right_eq = eq;
+		}
+		if (left_eq || right_eq)
+		{
+			left_eq->join(*right_eq);
+			if (left_eq && right_eq)
 			{
-				return this;
+				left_eq->join(*right_eq);
+				throw *left_eq;
 			}
-			num = std::get<number>(res);
+			throw left_eq.has_value() ? *left_eq : *right_eq;
 		}
-		return operation()(v.at(&m_left), v.at(&m_right));
+		return operation()(*left, *right);
+	}
+	action_base::unique_action binary_operator_action::copy() const
+	{
+		return std::make_unique<binary_operator_action>(*this);
 	}
 
 	size_t binary_operator_action::priority() const
