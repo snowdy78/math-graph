@@ -23,8 +23,13 @@ namespace mg
 		size_t priority() const override;
 
 	private:
-		constexpr static const char *s_binary_operator_action_pattern
-			= R"(^(?:(?:\((?:([+-]?(?:\d+\.?\d*|\d*\.\d+))|([a-zA-Z0-9_]+))\))|(?:([+-]?(?:\d+\.?\d*|\d*\.\d+))|([a-zA-Z0-9_]+)))\s*([+\-\*\/\^])\s*(?:(?:\((?:([+-]?(?:\d+\.?\d*|\d*\.\d+))|([a-zA-Z0-9_]+))\))|(?:((?:\d+\.?\d*|\d*\.\d+))|([a-zA-Z0-9_]+)))$)";
+		inline static string_type s_binary_operator_action_pattern = get_pattern(
+			R"(^(?:(?:\((?:(${__unary}?(?:\d+\.?\d*|\d*\.\d+))|([a-zA-Z0-9_]+))\))|(?:(${__unary}?(?:\d+\.?\d*|\d*\.\d+))|([a-zA-Z0-9_]+)))\s*(${__binary})\s*(?:(?:\((?:(${__unary}?(?:\d+\.?\d*|\d*\.\d+))|([a-zA-Z0-9_]+))\))|(?:((?:\d+\.?\d*|\d*\.\d+))|([a-zA-Z0-9_]+)))$)",
+			{
+				{ "${__unary}",	unary_operation::open_pattern()	},
+				{ "${__binary}", binary_operation::open_pattern() }
+		}
+		);
 
 		operand_type m_left, m_right;
 		binary_operation_pointer m_op = nullptr;

@@ -5,8 +5,6 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <functional>
-#include <array>
-#include "regex_tools.hpp"
 #include <cmath>
 
 namespace mg
@@ -21,34 +19,64 @@ namespace mg
 		using key_type			  = CharType;
 		using value_type		  = basic_operation;
 		using operations_map_type = std::unordered_map<key_type, const value_type *>;
+		using string_type		  = std::basic_string<CharType>;
 
 	private:
-		constexpr static const char *s_operations = R"(\+\-\*\/\^)";
-		constexpr static const char *rgx1		  = "^[";
-		constexpr static const char *rgx2		  = "]$";
-		constexpr static auto get_pattern()
+		struct operation_receiver
 		{
-			constexpr size_t N1 = std::char_traits<CharType>::length(rgx1);
-			constexpr size_t N2 = std::char_traits<CharType>::length(s_operations);
-			constexpr size_t N3 = std::char_traits<CharType>::length(rgx2);
-			return concat<N1 + N2, N3>(concat<N1, N2>(rgx1, s_operations).data(), rgx2);
-		}
-		constexpr static std::array s_pattern = get_pattern();
-
-		static string_type parse(const string_type &op)
-		{
-			std::regex allowed(s_pattern.data());
-			std::smatch match;
-			if (!std::regex_search(op, match, allowed))
+			operation_receiver() {}
+			void insert(const CharType &op)
 			{
-				throw std::runtime_error("unknown operation syntax");
+				if (m_operations.find(op) != string_type::npos)
+				{
+					throw std::runtime_error("operation_regex_pattern: operation already exists");
+				}
+				m_operations += string_type{ "\\" } + op;
+				m_state_updated = true;
 			}
-			return match[0].str();
+			string_type open_pattern() const
+			{
+				return m_operations.empty() ? "." : ("[" + m_operations + "]");
+			}
+			const string_type &pattern() const
+			{
+				if (m_state_updated)
+				{
+					m_pattern		= "^" + open_pattern() + "$";
+					m_state_updated = false;
+				}
+				return m_pattern;
+			}
+			const string_type &operations() const
+			{
+				return m_operations;
+			}
+
+		private:
+			string_type m_operations;
+			mutable string_type m_pattern;
+			mutable bool m_state_updated = true;
+		};
+		static operation_receiver &pattern()
+		{
+			static operation_receiver pattern;
+			return pattern;
+		}
+		inline static const char *s_operator_pattern = R"(^\W$)";
+		static key_type parse(const key_type &op)
+		{
+			std::basic_regex<key_type> rgx(s_operator_pattern);
+			if (!std::regex_search(string_type(1, op), rgx))
+			{
+				throw std::runtime_error("invalid name of operator. unable to parse");
+			}
+			pattern().insert(op);
+			return op;
 		}
 
 	protected:
 		basic_operation(const key_type &op, const size_t &priority, const function_type &function)
-			: m_name(parse(std::string(1, op))[0]),
+			: m_name(parse(op)),
 			  m_priority(priority),
 			  m_function(function)
 		{
@@ -85,7 +113,14 @@ namespace mg
 		{
 			return m_function(args...);
 		}
-
+		static const string_type &string_operations()
+		{
+			return pattern().operations();
+		} // for regex operations
+		static string_type open_pattern()
+		{
+			return pattern().open_pattern();
+		} // for regex
 	private:
 		key_type m_name;
 		size_t m_priority = 0;

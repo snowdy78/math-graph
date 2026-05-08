@@ -3,7 +3,6 @@
 #include "operation.hpp"
 #include "action_base.hpp"
 #include "unpack_variable_action.hpp"
-
 namespace mg
 {
 	class unary_operator_action : public action_base
@@ -78,7 +77,12 @@ namespace mg
 		}
 
 	private:
-		constexpr static const char *s_pattern = R"(^\s*[+-]?\s*((?:\d+.?\d*)|\d*(?:\d*.\d+))|([a-zA-Z0-9_]+)\s*$)";
+		inline static string_type s_pattern = get_pattern(
+			R"(^\s*${__unary}?\s*((?:\d+.?\d*)|\d*(?:\d*.\d+))|([a-zA-Z0-9_]+)\s*$)",
+			{
+				{ "${__unary}", unary_operation::open_pattern() }
+		  }
+		);
 		constexpr static const char *s_operator_pattern = R"(^\s*([-])|([+]?))";
 		operation_pointer m_op;
 		expression m_operand;
