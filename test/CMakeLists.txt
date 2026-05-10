@@ -14,15 +14,6 @@ include(Catch)
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 set(CMAKE_CATCH_DISCOVER_TESTS_DISCOVERY_MODE PRE_TEST)
 
-function(target_set_program_include_directories TARGET)
-    target_include_directories(
-        ${TARGET}
-        PRIVATE
-        ${PROJECT_SOURCE_DIR}/include
-    )
-endfunction()
-
-
 file(GLOB_RECURSE TEST_TOOLS_SOURCES ${PROJECT_SOURCE_DIR}/test/tools/*.cpp)
 set(TEST_TOOLS test_tools)
 add_library(${TEST_TOOLS} STATIC ${TEST_TOOLS_SOURCES})
@@ -32,7 +23,7 @@ function(add_catch2_test TARGET SOURCE_FILE)
 
     add_executable(${TARGET} ${SOURCE_FILE} ${PROGRAM_SOURCE_FILES})
     target_include_directories(${TARGET} PRIVATE /test)
-    target_set_program_include_directories(${TARGET})
+    target_link_depending_libraries(${TARGET})
 
     set_target_properties(${TARGET} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/test)
     set_target_properties(${TARGET} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/build/test)
