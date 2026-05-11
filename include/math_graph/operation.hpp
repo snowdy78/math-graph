@@ -2,6 +2,7 @@
 
 #include "mgraphfwd.hpp"
 #include "number.hpp"
+#include "prioritized.hpp"
 #include <stdexcept>
 #include <unordered_map>
 #include <functional>
@@ -12,7 +13,7 @@ namespace mg
 	template<class CharType, class RetT, class... Args>
 	struct basic_operation;
 	template<class CharType, class RetT, class... Args>
-	struct basic_operation<CharType, RetT(Args...)>
+	struct basic_operation<CharType, RetT(Args...)> : prioritized
 	{
 	public:
 		using function_type		  = std::function<RetT(Args...)>;
@@ -101,7 +102,7 @@ namespace mg
 		{
 			return m_name[0];
 		}
-		size_t priority() const
+		size_t priority() const override
 		{
 			return m_priority;
 		}
@@ -134,19 +135,19 @@ namespace mg
 	using unary_operation  = operation<number(const number &)>;
 	struct unique_operations
 	{
-		inline static const binary_operation add{ '+', 1, [](const number &a, const number &b) -> number {
+		inline static const binary_operation add{ '+', 4, [](const number &a, const number &b) -> number {
 													 return a + b;
 												 } };
-		inline static const binary_operation sub{ '-', 1, [](const number &a, const number &b) -> number {
+		inline static const binary_operation sub{ '-', 4, [](const number &a, const number &b) -> number {
 													 return a - b;
 												 } };
-		inline static const binary_operation mul{ '*', 2, [](const number &a, const number &b) -> number {
+		inline static const binary_operation mul{ '*', 3, [](const number &a, const number &b) -> number {
 													 return a * b;
 												 } };
-		inline static const binary_operation div{ '/', 2, [](const number &a, const number &b) -> number {
+		inline static const binary_operation div{ '/', 3, [](const number &a, const number &b) -> number {
 													 return a / b;
 												 } };
-		inline static const binary_operation pow{ '^', 3, [](const number &a, const number &b) -> number {
+		inline static const binary_operation pow{ '^', 1, [](const number &a, const number &b) -> number {
 													 return std::pow(a, b);
 												 } };
 		inline static const unary_operation plus{ '+', 2, [](const number &a) -> number {
