@@ -12,47 +12,42 @@ TEST_CASE("function call", "[test]")
 		  };
 	SECTION("correct args")
 	{
-		mg::expression x{ 4.0 };
 		mg::call_function_action sqrt{
 			fdef{ { "f(x)" }, mg::expression([](const mg::dependency_map &args) -> mg::expression::result_type {
 					  return std::sqrt(args.at("x")->evaluate(args));
 				  }) },
-			{ &x }
+			{ { 4.0 } }
 		};
 		check_result(sqrt, 2.0);
 	}
 	SECTION("multiple arguments")
 	{
-		mg::expression x{ 4.0 };
-		mg::expression n{ 2.0 };
 		mg::call_function_action pow{
 			fdef{ { "f(x, n)" }, mg::expression([](const mg::dependency_map &args) -> mg::expression::result_type {
 					  return std::pow(args.at({ "x" })->evaluate(args), args.at({ "n" })->evaluate(args));
 				  }) },
-			{ &x,			  &n					 }
+			{ { 4.0 },	   { 2.0 }			   }
 		};
 		check_result(pow, 16.0);
 	}
 	SECTION("not all args was provided")
 	{
-		mg::expression x{ 4.0 };
 		REQUIRE_THROWS(mg::call_function_action{
 			fdef{ { "f(x, n)" }, mg::expression([](const mg::dependency_map &args) -> mg::expression::result_type {
 					  return std::pow(args.at({ "x" })->evaluate(args), args.at({ "n" })->evaluate(args));
 				  }) },
 			{
-				 &x,
+				 { 4.0 },
 				 }
 		  });
 	}
 	SECTION("too much args was given")
 	{
-		mg::expression x{ 4.0 }, n{ 4.0 }, y{ 4.0 };
 		REQUIRE_THROWS(mg::call_function_action{
 			fdef{ { "f(x, n)" }, mg::expression([](const mg::dependency_map &args) -> mg::expression::result_type {
 					  return std::pow(args.at({ "x" })->evaluate(args), args.at({ "n" })->evaluate(args));
 				  }) },
-			{ &x, &n, &y }
-		   });
+			{ { 4.0 }, { 4.0 }, { 4.0 } }
+		  });
 	}
 }
