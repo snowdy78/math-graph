@@ -37,11 +37,21 @@ namespace mg
 				return is_initialized(arg.first);
 			});
 		}
-		bool is_all_initialized(const set_type &set)
+		bool all_initialized(const set_type &set) const
 		{
 			return std::all_of(set.begin(), set.end(), [this](const auto &arg) {
 				return is_initialized(arg);
 			});
+		}
+		bool all_initialized(const map_type &map) const
+		{
+			return std::all_of(map.begin(), map.end(), [this](const auto &arg) {
+				return is_initialized(arg.first);
+			});
+		}
+		bool all_initialized() const
+		{
+			return all_initialized(m_map);
 		}
 		map_type except(const set_type &set) const
 		{
