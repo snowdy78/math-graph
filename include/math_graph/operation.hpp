@@ -100,7 +100,7 @@ namespace mg
 	public:
 		key_type get() const
 		{
-			return m_name[0];
+			return m_name;
 		}
 		size_t priority() const override
 		{
