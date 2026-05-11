@@ -3,16 +3,40 @@
 #include "action_base.hpp"
 #include <functional>
 #include <variant>
+#include "function_declaration.hpp"
 
 namespace mg
 {
+	using function_dependencies = std::unordered_map<string_type, definition<function_declaration>>;
 	struct expression : action_base
 	{
 	private:
 		using function_type = std::function<result_type(const dependency_map &)>;
 		using value_type	= std::variant<number, function_type, unique_action>;
 
+		static value_type copy_value(const expression &other)
+		{
+			return std::visit<value_type>(
+				[](const auto &value) {
+					using T = std::decay_t<decltype(value)>;
+					if constexpr (std::is_same_v<unique_action, T>)
+					{
+						return value->copy();
+					}
+					else
+					{
+						return value;
+					}
+				},
+				other.m_value
+			);
+		}
+		static value_type parse(const string_type &str, const function_dependencies &);
+
 	public:
+		expression(const string_type &str, const function_dependencies &deps = {})
+			: m_value(parse(str, deps))
+		{}
 		expression(const number &n)
 			: m_value(n)
 		{}
@@ -31,20 +55,7 @@ namespace mg
 		}
 		expression(const expression &other)
 			: action_base(other),
-			  m_value(std::visit<value_type>(
-				  [](const auto &value) {
-					  using T = std::decay_t<decltype(value)>;
-					  if constexpr (std::is_same_v<unique_action, T>)
-					  {
-						  return value->copy();
-					  }
-					  else
-					  {
-						  return value;
-					  }
-				  },
-				  other.m_value
-			  ))
+			  m_value(copy_value(other))
 		{}
 
 		bool is_number() const
@@ -73,14 +84,22 @@ namespace mg
 		}
 		size_t priority() const override
 		{
+			if (is_expression())
+			{
+				return as_expression().priority();
+			}
 			return 0;
 		}
-		result_type evaluate(const dependency_map &values) const override
+		bool has_solution(const dependency_map &values) const
 		{
+			return values.all_initialized(deps()) && !is_function();
+		}
+		result_type evaluate(const dependency_map &values = {}) const override
+		{
+			if (!has_solution(values))
+				throw std::runtime_error("expression has no solution");
 			if (is_number())
 				return as_number();
-			if (is_function())
-				return as_function()(values);
 			return as_expression().evaluate(values);
 		}
 		unique_action copy() const override
@@ -92,20 +111,7 @@ namespace mg
 			if (this != &other)
 			{
 				static_cast<action_base &>(*this) = other;
-				m_value							  = std::visit<value_type>(
-					  [this](const auto &value) {
-						  using T = std::decay_t<decltype(value)>;
-						  if constexpr (std::is_same_v<unique_action, T>)
-						  {
-							  return value->copy();
-						  }
-						  else
-						  {
-							  return value;
-						  }
-					  },
-					  other.m_value
-				  );
+				m_value							  = copy_value(other);
 			}
 			return *this;
 		}
