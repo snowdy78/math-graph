@@ -92,7 +92,7 @@ namespace mg
 		}
 		bool has_solution(const dependency_map &values) const
 		{
-			return values.all_initialized(deps()) && !is_function();
+			return values.all_initialized(deps());
 		}
 		result_type evaluate(const dependency_map &values = {}) const override
 		{
@@ -100,6 +100,8 @@ namespace mg
 				throw std::runtime_error("expression has no solution");
 			if (is_number())
 				return as_number();
+			if (is_function())
+				return as_function()(values);
 			return as_expression().evaluate(values);
 		}
 		unique_action copy() const override
