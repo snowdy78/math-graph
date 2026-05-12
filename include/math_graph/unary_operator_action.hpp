@@ -64,7 +64,7 @@ namespace mg
 		}
 		result_type evaluate(const dependency_map &funcs) const override
 		{
-			return m_operand.evaluate(funcs);
+			return (*m_op)(m_operand.evaluate(funcs));
 		}
 		size_t priority() const override
 		{

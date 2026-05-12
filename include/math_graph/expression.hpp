@@ -36,7 +36,10 @@ namespace mg
 	public:
 		expression(const string_type &str, const function_dependencies &deps = {})
 			: m_value(parse(str, deps))
-		{}
+		{
+			if (std::holds_alternative<unique_action>(m_value))
+				pull_deps(*std::get<unique_action>(m_value));
+		}
 		expression(const number &n)
 			: m_value(n)
 		{}
@@ -51,7 +54,7 @@ namespace mg
 		expression(unique_action &&ptr_other)
 			: m_value(std::move(ptr_other))
 		{
-			pull_deps(*ptr_other);
+			pull_deps(*std::get<unique_action>(m_value));
 		}
 		expression(const expression &other)
 			: action_base(other),
