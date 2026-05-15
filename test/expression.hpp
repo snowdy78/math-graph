@@ -11,6 +11,7 @@ TEST_CASE("expression construct", "[test]")
 	auto check_expr = [](const mg::expression &expr, const mg::expression::result_type &expected,
 						 bool has_solution = true, const mg::dependency_map &values = {}) {
 		REQUIRE(expr.has_solution(values) == has_solution);
+		REQUIRE(expr.deps().size() == values.size());
 		REQUIRE(std::all_of(values.begin(), values.end(), [&](const auto &dep) {
 			return expr.deps().contains(dep.first);
 		}));
@@ -52,7 +53,6 @@ TEST_CASE("expression construct", "[test]")
 		{
 			SECTION("simple number")
 			{
-				mg::expression expr{ "2.0" };
 				check_str("2.0", {}, 2.0);
 			}
 			SECTION("actions with numbers")
